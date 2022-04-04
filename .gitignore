@@ -1,0 +1,8 @@
+/.env-dev
+/.env
+/.vscode
+/dist
+/media
+/node_modules
+error.log
+.env
