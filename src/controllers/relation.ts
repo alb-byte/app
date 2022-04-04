@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import * as RelationService from '../services/relation';
 import { TokenData } from '../models/request/TokenData';
+import { PageDto, UserIdDto } from '../newLib/dto';
 
 export const getFriends = (
-  req: Request<unknown, unknown, unknown, { page: number }>,
+  req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -12,22 +13,14 @@ export const getFriends = (
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const addFriend = (
-  req: Request<{ userId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const addFriend = (req: Request<UserIdDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
 
   RelationService.addFriend(user.id, req.params.userId)
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const deleteFriend = (
-  req: Request<{ userId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const deleteFriend = (req: Request<UserIdDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
 
   RelationService.deleteFriend(user.id, req.params.userId)
@@ -36,7 +29,7 @@ export const deleteFriend = (
 };
 
 export const getSubscribers = (
-  req: Request<unknown, unknown, unknown, { page: number }>,
+  req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -46,7 +39,7 @@ export const getSubscribers = (
     .catch(next);
 };
 export const getSubscriptions = (
-  req: Request<unknown, unknown, unknown, { page: number }>,
+  req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -56,7 +49,7 @@ export const getSubscriptions = (
     .catch(next);
 };
 export const addSubscription = (
-  req: Request<{ userId: string }>,
+  req: Request<UserIdDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -67,7 +60,7 @@ export const addSubscription = (
     .catch(next);
 };
 export const deleteSubscription = (
-  req: Request<{ userId: string }>,
+  req: Request<UserIdDto>,
   res: Response,
   next: NextFunction,
 ): void => {

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as SpecialityService from '../services/speciality';
+import { SpecialityBodyDto, SpecialityParamsDto } from '../newLib/dto';
 
 export const getAll = (req: Request, res: Response, next: NextFunction): void => {
   SpecialityService.getMany()
@@ -7,7 +8,7 @@ export const getAll = (req: Request, res: Response, next: NextFunction): void =>
     .catch(next);
 };
 export const getOne = (
-  req: Request<{ specialityId: string }>,
+  req: Request<SpecialityParamsDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -16,7 +17,7 @@ export const getOne = (
     .catch(next);
 };
 export const create = (
-  req: Request<unknown, unknown, { name: string }>,
+  req: Request<unknown, unknown, SpecialityBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -25,7 +26,7 @@ export const create = (
     .catch(next);
 };
 export const update = (
-  req: Request<{ specialityId: string }, unknown, { name: string }>,
+  req: Request<SpecialityParamsDto, unknown, SpecialityBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -34,7 +35,7 @@ export const update = (
     .catch(next);
 };
 export const remove = (
-  req: Request<{ specialityId: string }>,
+  req: Request<SpecialityParamsDto>,
   res: Response,
   next: NextFunction,
 ): void => {

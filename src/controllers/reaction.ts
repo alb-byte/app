@@ -11,9 +11,10 @@ import CreatePostDto, {
   validate as validateCreatePostDto,
 } from '../models/request/post/CreatePostDto';
 import { TokenData } from '../models/request/TokenData';
+import { PostIdDto } from '../newLib/dto';
 
 export const create = (
-  req: Request<{ postId: string }, CreatePostDto>,
+  req: Request<PostIdDto, CreatePostDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -26,11 +27,7 @@ export const create = (
   //     .catch(next);
 };
 
-export const remove = (
-  req: Request<{ postId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const remove = (req: Request<PostIdDto>, res: Response, next: NextFunction): void => {
   res.json({ postId: req.params.postId });
 
   //   const isValid = validateGetPostDto(req.params);

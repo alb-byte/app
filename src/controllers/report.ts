@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReportService from '../services/report';
 import { TokenData } from '../models/request/TokenData';
+import { PageDto, ReportBodyDto, ReportParamsDto, UserIdDto } from '../newLib/dto';
 
 export const getMany = (
-  req: Request<{ userId: string }, unknown, unknown, { page: number }>,
+  req: Request<UserIdDto, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -12,18 +13,14 @@ export const getMany = (
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const getOne = (
-  req: Request<{ userId: string; reportId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const getOne = (req: Request<ReportParamsDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
   ReportService.getOneReport(user.id, req.params.userId, req.params.reportId)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const create = (
-  req: Request<{ userId: string }, unknown, { body: string; isChecked: boolean }>,
+  req: Request<UserIdDto, unknown, ReportBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -33,7 +30,7 @@ export const create = (
     .catch(next);
 };
 export const update = (
-  req: Request<{ userId: string; reportId: string }, unknown, { body: string; isChecked: boolean }>,
+  req: Request<ReportParamsDto, unknown, ReportBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -42,11 +39,7 @@ export const update = (
     .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const remove = (
-  req: Request<{ userId: string; reportId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const remove = (req: Request<ReportParamsDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
   ReportService.removeReport(user.id, req.params.reportId)
     .then(() => res.sendStatus(204))
