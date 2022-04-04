@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReviewService from '../services/review';
 import { TokenData } from '../models/request/TokenData';
+import { PageDto, ReviewBodyDto, ReviewParamsDto, UserIdDto } from '../newLib/dto';
 
 export const getMany = (
-  req: Request<{ userId: string }, unknown, unknown, { page: number }>,
+  req: Request<UserIdDto, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -12,18 +13,14 @@ export const getMany = (
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const getOne = (
-  req: Request<{ userId: string; reviewId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const getOne = (req: Request<ReviewParamsDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
   ReviewService.getOneReview(user.id, req.params.userId, req.params.reviewId)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const create = (
-  req: Request<{ userId: string }, unknown, { body: string }>,
+  req: Request<UserIdDto, unknown, ReviewBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -33,7 +30,7 @@ export const create = (
     .catch(next);
 };
 export const update = (
-  req: Request<{ userId: string; reviewId: string }, unknown, { body: string }>,
+  req: Request<ReviewParamsDto, unknown, ReviewBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -42,11 +39,7 @@ export const update = (
     .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const remove = (
-  req: Request<{ userId: string; reviewId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const remove = (req: Request<ReviewParamsDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
   ReviewService.removeReview(user.id, req.params.reviewId)
     .then(() => res.sendStatus(204))

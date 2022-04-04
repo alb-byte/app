@@ -8,12 +8,9 @@ import { EditProfileRequestDto } from '../newLib/dto/profile/EditProfileRequestD
 import { DoctorInfoDto } from '../newLib/dto/profile/DoctorInfoDto';
 import { UserType } from '../newLib/enums';
 import { EditPacientInfoDto } from '../newLib/dto/profile/EditPacientInfoDto';
+import { GetOnePostDto, UserIdDto } from '../newLib/dto';
 
-export const getOne = (
-  req: Request<{ userId: string }>,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const getOne = (req: Request<GetOnePostDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
   ProfileService.getOne(user.id, req.params.userId)
     .then((dto) => res.json(dto))
@@ -40,7 +37,7 @@ export const edit = (
     .catch(next);
 };
 export const editInfo = (
-  req: Request<{ userId: string }, unknown, DoctorInfoDto | EditPacientInfoDto>,
+  req: Request<UserIdDto, unknown, DoctorInfoDto | EditPacientInfoDto>,
   res: Response,
   next: NextFunction,
 ): void => {
