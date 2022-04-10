@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReviewService from '../services/review';
-import { TokenData } from '../models/request/TokenData';
-import { PageDto, ReviewBodyDto, ReviewParamsDto, UserIdDto } from '../newLib/dto';
+import { TokenData } from '../models/TokenData';
+import { PageDto, ReviewBodyDto, ReviewParamsDto } from '../dto';
 
 export const getMany = (
-  req: Request<UserIdDto, unknown, unknown, PageDto>,
+  req: Request<{ userId: string }, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -20,7 +20,7 @@ export const getOne = (req: Request<ReviewParamsDto>, res: Response, next: NextF
     .catch(next);
 };
 export const create = (
-  req: Request<UserIdDto, unknown, ReviewBodyDto>,
+  req: Request<{ userId: string }, unknown, ReviewBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {

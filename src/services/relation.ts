@@ -1,9 +1,9 @@
 import createHttpError from 'http-errors';
-import { UserModel } from '../models/models';
-import { ItemListResponseDto } from '../newLib/dto';
-import { UserPreviewResponseDto } from '../newLib/dto/user/UserPreviewResponseDto';
-import { UserType } from '../newLib/enums';
-import { UserRelation } from '../newLib/enums/UserRelation';
+import { UserModel } from '../models/entities';
+import { ItemListResponseDto } from '../dto';
+import { UserPreviewResponseDto } from '../dto/user/UserPreviewResponseDto';
+import { UserType } from '../enums';
+import { UserRelation } from '../enums/UserRelation';
 const PAGE_SIZE = 5;
 
 export const getSubscriptions = async (

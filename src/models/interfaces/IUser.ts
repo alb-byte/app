@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { Sex, UserType } from '../../newLib/enums';
+import { Sex, UserType } from '../../enums';
 
 export interface IUser {
   email: string;

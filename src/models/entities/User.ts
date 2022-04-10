@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { Sex, UserType } from '../../newLib/enums';
+import { Sex, UserType } from '../../enums';
 import { IUser } from '../interfaces';
 
 const UserSchema = new Schema<IUser>(

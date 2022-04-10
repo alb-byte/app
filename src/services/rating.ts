@@ -1,4 +1,4 @@
-import { RatingModel } from '../models/models';
+import { RatingModel } from '../models/entities';
 
 export const addRating = async (
   authUserId: string,

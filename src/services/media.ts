@@ -2,8 +2,7 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import sharp from 'sharp';
 import { v4 as generateUuid } from 'uuid';
 import config from '../libs/config';
-import { InternalServerError, NotFoundError } from '../models/exception/httpError';
-import GetMediaDto from '../models/request/media/GetMediaDto';
+import { InternalServerError, NotFoundError } from '../exception/httpError';
 import { isStatusCodeSuccess } from '../utils/http';
 
 const resize = async (buffer: Buffer, width = 500, height = 500): Promise<Buffer> => {
@@ -39,7 +38,11 @@ export const save = async (file: Express.Multer.File): Promise<CreateFileRespons
   else throw new InternalServerError('save file error');
 };
 
-export const get = async (dto: GetMediaDto, width: number, height: number): Promise<Buffer> => {
+export const get = async (
+  dto: { fileName: string },
+  width: number,
+  height: number,
+): Promise<Buffer> => {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     config.azureBlobStorage.connectionString,
   );

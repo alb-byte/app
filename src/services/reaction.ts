@@ -1,4 +1,4 @@
-import { PostModel } from '../models/models/Post';
+import { PostModel } from '../models/entities/Post';
 import { Types } from 'mongoose';
 
 export const create = async (authUserId: string, postId: string): Promise<void> => {

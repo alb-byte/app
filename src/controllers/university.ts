@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as UniversityService from '../services/university';
-import { UniversityBodyDto, UniversityParamsDto } from '../newLib/dto';
+import { UniversityBodyDto, UniversityParamsDto } from '../dto';
 
 export const getAll = (req: Request, res: Response, next: NextFunction): void => {
   UniversityService.getMany()

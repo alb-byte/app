@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { AcademicDegree, DoctorCategory, DoctorType } from '../../newLib/enums';
+import { AcademicDegree, DoctorCategory, DoctorType } from '../../enums';
 
 export interface IDoctorInfo {
   userId: Types.ObjectId;

@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import config from '../libs/config';
-import { AuthenticationError, AuthorizationError } from '../models/exception/httpError';
+import { AuthenticationError, AuthorizationError } from '../exception/httpError';
 import createHttpError from 'http-errors';
-import { UserType } from '../newLib/enums';
-import { TokenData } from '../models/request/TokenData';
+import { UserType } from '../enums';
+import { TokenData } from '../models/TokenData';
 export default {
   authFilter: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

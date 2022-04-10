@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as PostService from '../services/post';
-import { TokenData } from '../models/request/TokenData';
-import { CreatePostRequestDto, GetUserPostsQuery, UpdatePostRequestDto } from '../newLib/dto/post';
+import { TokenData } from '../models/TokenData';
+import { CreatePostRequestDto, GetUserPostsQuery, UpdatePostRequestDto } from '../dto/post';
 
 export const getMany = (
   req: Request<unknown, unknown, unknown, GetUserPostsQuery>,

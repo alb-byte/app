@@ -1,9 +1,4 @@
-import { GetManyDto as GetFeedCommentDto } from './feed/GetManyDto';
-import { GetOneDto as GetOnePostDto } from './profile/GetOneDto';
-import { UserIdDto } from './general/UserIdDto';
-import { PostIdDto } from './general/PostIdDto';
 import { PageDto } from './general/PageDto';
-import { ScoreDto as ScoreRatingDto } from './rating/ScoreDto';
 import { ReportParamsDto } from './report/ReportParamsDto';
 import { ReportBodyDto } from './report/ReportBodyDto';
 import { ReviewBodyDto } from './review/ReviewBodyDto';
@@ -17,11 +12,6 @@ import { ItemListResponseDto } from './general/ItemListResponseDto';
 import { PostResponseDto } from './post/PostResponseDto';
 
 export {
-  GetFeedCommentDto,
-  GetOnePostDto,
-  UserIdDto,
-  ScoreRatingDto,
-  PostIdDto,
   PageDto,
   ReportParamsDto,
   ReportBodyDto,

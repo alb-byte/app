@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { TokenData } from '../models/request/TokenData';
-import { GetFeedCommentDto } from '../newLib/dto';
+import { TokenData } from '../models/TokenData';
 import * as FeedService from '../services/feed';
 
 export const getMany = (
-  req: Request<unknown, unknown, unknown, GetFeedCommentDto>,
+  req: Request<unknown, unknown, unknown, { page: number }>,
   res: Response,
   next: NextFunction,
 ): void => {

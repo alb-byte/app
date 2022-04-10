@@ -1,5 +1,5 @@
 import { IUniversity } from '../models/interfaces';
-import { UniversityModel } from '../models/models';
+import { UniversityModel } from '../models/entities';
 
 export const getMany = async (): Promise<Array<IUniversity>> => {
   const universities = await UniversityModel.find({}).lean();

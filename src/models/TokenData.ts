@@ -1,4 +1,4 @@
-import { UserType } from '../../newLib/enums';
+import { UserType } from '../enums';
 
 export interface TokenData {
   id: string;

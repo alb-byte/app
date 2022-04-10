@@ -1,5 +1,5 @@
-import { ReviewModel } from '../models/models';
-import { ItemListResponseDto } from '../newLib/dto';
+import { ReviewModel } from '../models/entities';
+import { ItemListResponseDto } from '../dto';
 const PAGE_SIZE = 5;
 
 export const getOneReview = async (

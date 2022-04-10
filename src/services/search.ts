@@ -1,17 +1,12 @@
-import SearchUserDto from '../models/request/search/SearchUserDto';
-import SearchDoctorDto from '../models/request/search/SearchDoctorDto';
 import _ from 'lodash';
 import { IUser } from '../models/interfaces';
-import { UserModel } from '../models/models';
+import { UserModel } from '../models/entities';
 const PAGE_SIZE = 5;
 interface SearchUsersResponse {
   totalCount: number;
   users: Array<IUser>;
 }
-export const searchUser = async (
-  authUserId: string,
-  dto: SearchUserDto,
-): Promise<SearchUsersResponse> => {
+export const searchUser = async (authUserId: string, dto: any): Promise<SearchUsersResponse> => {
   const page = dto.page || 1;
   const termFilter = dto.fullName && {
     $expr: {
@@ -42,10 +37,7 @@ export const searchUser = async (
   };
 };
 
-export const searchDoctor = async (
-  authUserId: string,
-  dto: SearchDoctorDto,
-): Promise<SearchUsersResponse> => {
+export const searchDoctor = async (authUserId: string, dto: any): Promise<SearchUsersResponse> => {
   const { page, fullName, ...search } = dto;
   const pageNumber = page || 1;
   const termFilter = fullName && {

@@ -1,5 +1,5 @@
 import { ISpeciality } from '../models/interfaces';
-import { SpecialityModel } from '../models/models';
+import { SpecialityModel } from '../models/entities';
 
 export const getMany = async (): Promise<Array<ISpeciality> | null> => {
   const specialities = await SpecialityModel.find({}).lean();

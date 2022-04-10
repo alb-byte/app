@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { TokenData } from '../models/request/TokenData';
-import { CreateCommentRequestDto } from '../newLib/dto/comment/CreateCommentRequestDto';
-import { UpdateCommentRequestDto } from '../newLib/dto/comment/UpdateCommentRequestDto';
+import { TokenData } from '../models/TokenData';
+import { CreateCommentRequestDto } from '../dto/comment/CreateCommentRequestDto';
+import { UpdateCommentRequestDto } from '../dto/comment/UpdateCommentRequestDto';
 import * as CommentService from '../services/comment';
 
 export const getMany = (

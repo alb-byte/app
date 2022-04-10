@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as RelationService from '../services/relation';
-import { TokenData } from '../models/request/TokenData';
-import { PageDto, UserIdDto } from '../newLib/dto';
+import { TokenData } from '../models/TokenData';
+import { PageDto } from '../dto';
 
 export const getFriends = (
   req: Request<unknown, unknown, unknown, PageDto>,
@@ -13,14 +13,22 @@ export const getFriends = (
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const addFriend = (req: Request<UserIdDto>, res: Response, next: NextFunction): void => {
+export const addFriend = (
+  req: Request<{ userId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
   const user = req.user as TokenData;
 
   RelationService.addFriend(user.id, req.params.userId)
     .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const deleteFriend = (req: Request<UserIdDto>, res: Response, next: NextFunction): void => {
+export const deleteFriend = (
+  req: Request<{ userId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
   const user = req.user as TokenData;
 
   RelationService.deleteFriend(user.id, req.params.userId)
@@ -49,7 +57,7 @@ export const getSubscriptions = (
     .catch(next);
 };
 export const addSubscription = (
-  req: Request<UserIdDto>,
+  req: Request<{ userId: string }>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -60,7 +68,7 @@ export const addSubscription = (
     .catch(next);
 };
 export const deleteSubscription = (
-  req: Request<UserIdDto>,
+  req: Request<{ userId: string }>,
   res: Response,
   next: NextFunction,
 ): void => {

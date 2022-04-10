@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as SpecialityService from '../services/speciality';
-import { SpecialityBodyDto, SpecialityParamsDto } from '../newLib/dto';
+import { SpecialityBodyDto, SpecialityParamsDto } from '../dto';
 
 export const getAll = (req: Request, res: Response, next: NextFunction): void => {
   SpecialityService.getMany()

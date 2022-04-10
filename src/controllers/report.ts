@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReportService from '../services/report';
-import { TokenData } from '../models/request/TokenData';
-import { PageDto, ReportBodyDto, ReportParamsDto, UserIdDto } from '../newLib/dto';
+import { TokenData } from '../models/TokenData';
+import { PageDto, ReportBodyDto, ReportParamsDto } from '../dto';
 
 export const getMany = (
-  req: Request<UserIdDto, unknown, unknown, PageDto>,
+  req: Request<{ userId: string }, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -20,7 +20,7 @@ export const getOne = (req: Request<ReportParamsDto>, res: Response, next: NextF
     .catch(next);
 };
 export const create = (
-  req: Request<UserIdDto, unknown, ReportBodyDto>,
+  req: Request<{ userId: string }, unknown, ReportBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {

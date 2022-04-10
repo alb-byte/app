@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReactionService from '../services/reaction';
-import { TokenData } from '../models/request/TokenData';
+import { TokenData } from '../models/TokenData';
 
 export const create = (
   req: Request<{ postId: string }>,

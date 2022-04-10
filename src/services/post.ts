@@ -1,9 +1,9 @@
-import { NotFoundError } from '../models/exception/httpError';
-import { PostModel } from '../models/models/Post';
+import { NotFoundError } from '../exception/httpError';
+import { PostModel } from '../models/entities/Post';
 import { IUser } from '../models/interfaces';
-import { FeedModel, UserModel } from '../models/models';
-import { CreatePostRequestDto, GetUserPostsQuery, UpdatePostRequestDto } from '../newLib/dto/post';
-import { ItemListResponseDto, PostResponseDto } from '../newLib/dto';
+import { FeedModel, UserModel } from '../models/entities';
+import { CreatePostRequestDto, GetUserPostsQuery, UpdatePostRequestDto } from '../dto/post';
+import { ItemListResponseDto, PostResponseDto } from '../dto';
 import { Types } from 'mongoose';
 const PAGE_SIZE = 5;
 

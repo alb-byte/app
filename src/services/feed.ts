@@ -1,5 +1,5 @@
-import { FeedModel } from '../models/models';
-import { ItemListResponseDto, PostResponseDto } from '../newLib/dto';
+import { FeedModel } from '../models/entities';
+import { ItemListResponseDto, PostResponseDto } from '../dto';
 import { Types } from 'mongoose';
 const PAGE_SIZE = 10;
 export const getMany = async (

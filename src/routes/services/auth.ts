@@ -1,8 +1,8 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import config from '../libs/config';
-import { BadRequestError } from '../exception/httpError';
+import config from '../../libs/config';
+import { BadRequestError } from '../../exception/httpError';
 import * as MailService from './mail';
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
@@ -12,16 +12,16 @@ import {
   PacientInfoModel,
   RefreshSessionModel,
   UserModel,
-} from '../models/entities';
-import { UserType } from '../enums';
-import { IConfirmSession, IRefreshSession } from '../models/interfaces';
-import { LoginRequestDto } from '../dto/auth/LoginRequestDto';
-import { RegistrationRequestDto } from '../dto/auth/RegistrationRequestDto';
-import { RefreshTokenRequestDto } from '../dto/auth/RefreshTokenRequestDto';
-import { ConfirmCodeRequestDto } from '../dto/auth/ConfirmCodeRequestDto';
-import { ResendCodeRequestDto } from '../dto/auth/ResendCodeRequestDto';
-import { AuthResponseDto } from '../dto/auth/AuthResponseDto';
-import { AuthMessageResponseDto } from '../dto/auth/AuthMessageResponseDto';
+} from '../../models/entities';
+import { UserType } from '../../enums';
+import { IConfirmSession, IRefreshSession } from '../../models/interfaces';
+import { LoginRequestDto } from '../../newLib/dto/auth/LoginRequestDto';
+import { RegistrationRequestDto } from '../../newLib/dto/auth/RegistrationRequestDto';
+import { RefreshTokenRequestDto } from '../../newLib/dto/auth/RefreshTokenRequestDto';
+import { ConfirmCodeRequestDto } from '../../newLib/dto/auth/ConfirmCodeRequestDto';
+import { ResendCodeRequestDto } from '../../newLib/dto/auth/ResendCodeRequestDto';
+import { AuthResponseDto } from '../../newLib/dto/auth/AuthResponseDto';
+import { AuthMessageResponseDto } from '../../newLib/dto/auth/AuthMessageResponseDto';
 interface AccessTokenDto {
   _id: string;
   userType: UserType;

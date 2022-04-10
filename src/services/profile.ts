@@ -6,15 +6,15 @@ import {
   RatingModel,
   ReviewModel,
   UserModel,
-} from '../models/models';
-import { UserResponseDto } from '../newLib/dto/profile/UserResponseDto';
-import { UserRelation } from '../newLib/enums/UserRelation';
-import { DoctorInfoDto } from '../newLib/dto/profile/DoctorInfoDto';
-import { PacientInfoDto } from '../newLib/dto/profile/PacientInfoDto';
-import { UserType } from '../newLib/enums';
-import { EditProfileRequestDto } from '../newLib/dto/profile/EditProfileRequestDto';
-import { EditPacientInfoDto } from '../newLib/dto/profile/EditPacientInfoDto';
-import { DoctorInfoResponseDto } from '../newLib/dto/profile/DoctorInfoResponseDto';
+} from '../models/entities';
+import { UserResponseDto } from '../dto/profile/UserResponseDto';
+import { UserRelation } from '../enums/UserRelation';
+import { DoctorInfoDto } from '../dto/profile/DoctorInfoDto';
+import { PacientInfoDto } from '../dto/profile/PacientInfoDto';
+import { UserType } from '../enums';
+import { EditProfileRequestDto } from '../dto/profile/EditProfileRequestDto';
+import { EditPacientInfoDto } from '../dto/profile/EditPacientInfoDto';
+import { DoctorInfoResponseDto } from '../dto/profile/DoctorInfoResponseDto';
 import { IRating } from '../models/interfaces';
 export const getOne = async (authUserId: string, userId: string): Promise<UserResponseDto> => {
   let user: Omit<UserResponseDto, 'userInfo'> | null = null;

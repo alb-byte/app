@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { AcademicDegree, DoctorCategory, DoctorType } from '../../newLib/enums';
+import { AcademicDegree, DoctorCategory, DoctorType } from '../../enums';
 import { IDoctorInfo } from '../interfaces';
 const DoctorInfoSchema = new Schema<IDoctorInfo>(
   {

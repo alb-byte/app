@@ -1,11 +1,11 @@
-import { NotFoundError } from '../models/exception/httpError';
+import { NotFoundError } from '../exception/httpError';
 import { IUser } from '../models/interfaces';
-import { CommentModel, UserModel } from '../models/models';
-import { ItemListResponseDto } from '../newLib/dto';
-import { CommentResponseDto } from '../newLib/dto/comment/CommentResponseDto';
-import { CreateCommentRequestDto } from '../newLib/dto/comment/CreateCommentRequestDto';
+import { CommentModel, UserModel } from '../models/entities';
+import { ItemListResponseDto } from '../dto';
+import { CommentResponseDto } from '../dto/comment/CommentResponseDto';
+import { CreateCommentRequestDto } from '../dto/comment/CreateCommentRequestDto';
 import { Types } from 'mongoose';
-import { PostModel } from '../models/models/Post';
+import { PostModel } from '../models/entities/Post';
 
 const PAGE_SIZE = 5;
 
