@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 import { IPost } from '../interfaces';
 const PostSchema = new Schema<IPost>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     title: {
       type: Schema.Types.String,
       required: true,
@@ -14,7 +14,9 @@ const PostSchema = new Schema<IPost>(
     image: {
       type: Schema.Types.String,
     },
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+    likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
-  { versionKey: false },
+  { versionKey: false, timestamps: true },
 );
 export const PostModel = model<IPost>('Post', PostSchema);

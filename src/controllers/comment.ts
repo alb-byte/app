@@ -1,16 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import { TokenData } from '../models/request/TokenData';
-import {
-  CreateCommentDto,
-  GetManyCommentsDto,
-  GetOneCommentDto,
-  RemoveCommentDto,
-  UpdateCommentDto,
-} from '../newLib/dto';
+import { CreateCommentRequestDto } from '../newLib/dto/comment/CreateCommentRequestDto';
+import { UpdateCommentRequestDto } from '../newLib/dto/comment/UpdateCommentRequestDto';
 import * as CommentService from '../services/comment';
 
 export const getMany = (
-  req: Request<{ postId: string }, unknown, unknown, GetManyCommentsDto>,
+  req: Request<{ postId: string }, unknown, unknown, { page: number }>,
   res: Response,
   next: NextFunction,
 ) => {
@@ -18,34 +13,42 @@ export const getMany = (
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const getOne = (req: Request<GetOneCommentDto>, res: Response, next: NextFunction) => {
+export const getOne = (
+  req: Request<{ commentId: string; postId: string }>,
+  res: Response,
+  next: NextFunction,
+) => {
   CommentService.getOne(req.params.commentId)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const create = (
-  req: Request<Pick<CreateCommentDto, 'postId'>, unknown, Pick<CreateCommentDto, 'body'>>,
+  req: Request<{ postId: string }, unknown, CreateCommentRequestDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  CommentService.create(user.id, req.params.postId, req.body.body)
+  CommentService.create(user.id, req.params.postId, req.body)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const update = (
-  req: Request<Omit<UpdateCommentDto, 'body'>, unknown, Pick<UpdateCommentDto, 'body'>>,
+  req: Request<{ commentId: string; postId: string }, unknown, UpdateCommentRequestDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  CommentService.update(user.id, req.params.commentId, req.body.body)
+  CommentService.update(user.id, req.params.commentId, req.body)
     .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const remove = (req: Request<RemoveCommentDto>, res: Response, next: NextFunction): void => {
+export const remove = (
+  req: Request<{ commentId: string; postId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
   const user = req.user as TokenData;
-  CommentService.remove(user.id, req.params.commentId)
+  CommentService.remove(user.id, req.params.postId, req.params.commentId)
     .then(() => res.sendStatus(204))
     .catch(next);
 };

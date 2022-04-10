@@ -1,6 +1,12 @@
 import createHttpError from 'http-errors';
 import { Types } from 'mongoose';
-import { DoctorInfoModel, PacientInfoModel, UserModel } from '../models/models';
+import {
+  DoctorInfoModel,
+  PacientInfoModel,
+  RatingModel,
+  ReviewModel,
+  UserModel,
+} from '../models/models';
 import { UserResponseDto } from '../newLib/dto/profile/UserResponseDto';
 import { UserRelation } from '../newLib/enums/UserRelation';
 import { DoctorInfoDto } from '../newLib/dto/profile/DoctorInfoDto';
@@ -8,6 +14,8 @@ import { PacientInfoDto } from '../newLib/dto/profile/PacientInfoDto';
 import { UserType } from '../newLib/enums';
 import { EditProfileRequestDto } from '../newLib/dto/profile/EditProfileRequestDto';
 import { EditPacientInfoDto } from '../newLib/dto/profile/EditPacientInfoDto';
+import { DoctorInfoResponseDto } from '../newLib/dto/profile/DoctorInfoResponseDto';
+import { IRating } from '../models/interfaces';
 export const getOne = async (authUserId: string, userId: string): Promise<UserResponseDto> => {
   let user: Omit<UserResponseDto, 'userInfo'> | null = null;
   if (authUserId === userId) {
@@ -59,10 +67,11 @@ export const getOne = async (authUserId: string, userId: string): Promise<UserRe
     if (userFromDb) {
       let relation = UserRelation.Unknown;
       if (users[0]) {
-        if (users[0].friends.includes(new Types.ObjectId(userId))) relation = UserRelation.Friend;
-        else if (users[0].subscribers.includes(new Types.ObjectId(userId)))
+        if (users[0].friends.map((i) => i.toString()).includes(userId))
+          relation = UserRelation.Friend;
+        else if (users[0].subscribers.map((i) => i.toString()).includes(userId))
           relation = UserRelation.IncomingRequest;
-        else if (users[0].subscriptions.includes(new Types.ObjectId(authUserId)))
+        else if (users[0].subscriptions.map((i) => i.toString()).includes(userId))
           relation = UserRelation.OutgoingRequest;
       }
       user = {
@@ -84,7 +93,7 @@ export const getOne = async (authUserId: string, userId: string): Promise<UserRe
     }
   }
   if (!user) throw createHttpError(404, 'user not found');
-  let userInfo: DoctorInfoDto | PacientInfoDto | null | null = null;
+  let userInfo: DoctorInfoResponseDto | PacientInfoDto | null | null = null;
   if (user.userType === UserType.PACIENT) {
     userInfo = await PacientInfoModel.findOne(
       { userId: user._id },
@@ -96,22 +105,67 @@ export const getOne = async (authUserId: string, userId: string): Promise<UserRe
       },
     ).lean();
   } else {
-    userInfo = await DoctorInfoModel.findOne(
-      { userId: user._id },
-      {
-        createdAt: 0,
-        updatedAt: 0,
-        userId: 0,
-        _id: 0,
-      },
-    ).lean();
+    const allDoctorInfo = await Promise.all([
+      DoctorInfoModel.findOne<DoctorInfoDto>(
+        { userId: user._id },
+        {
+          createdAt: 0,
+          updatedAt: 0,
+          userId: 0,
+          _id: 0,
+        },
+      ).lean(),
+      RatingModel.aggregate<{
+        _id: Types.ObjectId;
+        totalRatingCount: number;
+        avgRating: number;
+        scores: Array<IRating>;
+      }>([
+        {
+          $match: { doctorId: new Types.ObjectId(user._id) },
+        },
+        {
+          $group: {
+            _id: '$doctorId',
+            totalRatingCount: {
+              $count: {},
+            },
+            avgRating: {
+              $avg: '$score',
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'ratings',
+            localField: '_id',
+            foreignField: 'doctorId',
+            as: 'scores',
+          },
+        },
+      ]),
+      ReviewModel.countDocuments({ doctorId: user._id }),
+    ]);
+    if (allDoctorInfo[0])
+      userInfo = {
+        ...allDoctorInfo[0],
+        totalReviewCount: allDoctorInfo[2],
+        totalRatingCount: allDoctorInfo[1][0]?.totalRatingCount || 0,
+        myRating: allDoctorInfo[1][0]
+          ? allDoctorInfo[1][0].scores.find((i) => i.userId.toString() === authUserId)?.score ||
+            null
+          : null,
+        avgRating: allDoctorInfo[1][0]?.avgRating || 0,
+      };
   }
-  return { ...user, userInfo };
+  return {
+    ...user,
+    showInfo:
+      user.relation === UserRelation.Friend || (user.relation === UserRelation.Me && user.showInfo),
+    userInfo,
+  };
 };
-export const edit = async (
-  userId: string,
-  dto: EditProfileRequestDto,
-): Promise<UserResponseDto> => {
+export const edit = async (userId: string, dto: EditProfileRequestDto): Promise<void> => {
   const userFromDb = await UserModel.findByIdAndUpdate(
     userId,
     {
@@ -128,32 +182,10 @@ export const edit = async (
       new: true,
     },
   ).lean();
-  if (userFromDb) {
-    let user: Omit<UserResponseDto, 'userInfo'> | null = null;
-    user = {
-      _id: userFromDb._id.toString(),
-      email: userFromDb.email,
-      firstName: userFromDb.firstName,
-      lastName: userFromDb.lastName,
-      sex: userFromDb.sex,
-      userType: userFromDb.userType,
-      aboutMe: userFromDb.aboutMe,
-      avatar: userFromDb.avatar,
-      isBlocked: userFromDb.isBlocked,
-      relation: UserRelation.Me,
-      showInfo: userFromDb.showInfo,
-      isAproved: userFromDb.isAproved,
-      createdAt: userFromDb.createdAt,
-      updatedAt: userFromDb.updatedAt,
-    };
-    return { ...user, userInfo: null };
-  } else throw createHttpError(404, 'user not found');
+  if (!userFromDb) throw createHttpError(404, 'user not found');
 };
 
-export const editDoctorInfo = async (
-  userId: string,
-  dto: DoctorInfoDto,
-): Promise<DoctorInfoDto> => {
+export const editDoctorInfo = async (userId: string, dto: DoctorInfoDto): Promise<void> => {
   const userInfoFromDb = await DoctorInfoModel.findOneAndUpdate(
     { userId },
     {
@@ -168,23 +200,9 @@ export const editDoctorInfo = async (
     },
   ).lean();
   await UserModel.findByIdAndUpdate(userId, { $set: { isAproved: false } });
-  if (userInfoFromDb) {
-    return {
-      address: userInfoFromDb.address,
-      firstSpeciality: userInfoFromDb.firstSpeciality.toString(),
-      secondSpeciality: userInfoFromDb.secondSpeciality.toString(),
-      academicDegree: userInfoFromDb.academicDegree,
-      category: userInfoFromDb.category,
-      type: userInfoFromDb.type,
-      university: userInfoFromDb.university.toString(),
-      universityGraduationYear: userInfoFromDb.universityGraduationYear,
-    };
-  } else throw createHttpError(404, 'user not found');
+  if (!userInfoFromDb) throw createHttpError(404, 'user not found');
 };
-export const editPacientInfo = async (
-  userId: string,
-  dto: EditPacientInfoDto,
-): Promise<PacientInfoDto> => {
+export const editPacientInfo = async (userId: string, dto: EditPacientInfoDto): Promise<void> => {
   const { showInfo, ...pacientInfoDto } = dto;
   const userInfoFromDb = await PacientInfoModel.findOneAndUpdate(
     { userId },
@@ -203,7 +221,5 @@ export const editPacientInfo = async (
   await UserModel.findByIdAndUpdate(userId, {
     $set: { showInfo, userInfo: userInfoFromDb._id },
   });
-  if (userInfoFromDb) {
-    return userInfoFromDb;
-  } else throw createHttpError(404, 'user not found');
+  if (!userInfoFromDb) throw createHttpError(404, 'user not found');
 };

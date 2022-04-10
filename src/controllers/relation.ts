@@ -17,14 +17,14 @@ export const addFriend = (req: Request<UserIdDto>, res: Response, next: NextFunc
   const user = req.user as TokenData;
 
   RelationService.addFriend(user.id, req.params.userId)
-    .then((dto) => res.json(dto))
+    .then(() => res.sendStatus(204))
     .catch(next);
 };
 export const deleteFriend = (req: Request<UserIdDto>, res: Response, next: NextFunction): void => {
   const user = req.user as TokenData;
 
   RelationService.deleteFriend(user.id, req.params.userId)
-    .then((dto) => res.json(dto))
+    .then(() => res.sendStatus(204))
     .catch(next);
 };
 

@@ -5,11 +5,18 @@ export const addRating = async (
   userId: string,
   score: number,
 ): Promise<void> => {
-  await RatingModel.create({
-    doctorId: userId,
-    userId: authUserId,
-    score,
-  });
+  await RatingModel.findOneAndUpdate(
+    {
+      doctorId: userId,
+      userId: authUserId,
+    },
+    {
+      doctorId: userId,
+      userId: authUserId,
+      score,
+    },
+    { upsert: true },
+  );
 };
 export const removeRating = async (authUserId: string, userId: string): Promise<void> => {
   await RatingModel.findOneAndDelete({

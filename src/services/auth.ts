@@ -9,6 +9,7 @@ import { Types } from 'mongoose';
 import {
   ConfirmSessionModel,
   DoctorInfoModel,
+  PacientInfoModel,
   RefreshSessionModel,
   UserModel,
 } from '../models/models';
@@ -19,6 +20,8 @@ import { RegistrationRequestDto } from '../newLib/dto/auth/RegistrationRequestDt
 import { RefreshTokenRequestDto } from '../newLib/dto/auth/RefreshTokenRequestDto';
 import { ConfirmCodeRequestDto } from '../newLib/dto/auth/ConfirmCodeRequestDto';
 import { ResendCodeRequestDto } from '../newLib/dto/auth/ResendCodeRequestDto';
+import { AuthResponseDto } from '../newLib/dto/auth/AuthResponseDto';
+import { AuthMessageResponseDto } from '../newLib/dto/auth/AuthMessageResponseDto';
 interface AccessTokenDto {
   _id: string;
   userType: UserType;
@@ -88,11 +91,8 @@ const generateConfirmSession = (userId: string): IConfirmSession => {
   };
 };
 //-------------------public----------------
-interface LoginResponseDto {
-  accessToken: string;
-  refreshToken: string;
-}
-export const login = async (dto: LoginRequestDto): Promise<LoginResponseDto> => {
+
+export const login = async (dto: LoginRequestDto): Promise<AuthResponseDto> => {
   const user = await UserModel.findOne(
     { email: dto.email },
     {
@@ -114,13 +114,10 @@ export const login = async (dto: LoginRequestDto): Promise<LoginResponseDto> => 
   await addRefreshSession(refreshSession);
   return { accessToken, refreshToken: refreshSession.token };
 };
-interface RegistrationResponseDto {
-  message: string;
-  userId: string;
-}
+
 export const registration = async (
   dto: RegistrationRequestDto,
-): Promise<RegistrationResponseDto> => {
+): Promise<AuthMessageResponseDto> => {
   const emailIsExists = await UserModel.exists({ email: dto.email });
   if (emailIsExists) throw new BadRequestError('Пользователь с этой почтой уже зарегистрирован');
   const { doctorInfo, ...userInfo } = dto;
@@ -147,6 +144,45 @@ export const registration = async (
         await UserModel.findByIdAndUpdate(user._id, { $set: { userInfo: docInfo._id } });
       }),
     );
+  } else if (dto.userType === UserType.PACIENT) {
+    promises.push(
+      PacientInfoModel.create({
+        userId: user._id,
+        heartDisease: false,
+        bloodDisease: false,
+        liverDisease: false,
+        kidneyDisease: false,
+        lungDisease: false,
+        skinDisease: false,
+        infectiousDisease: false,
+        bowelDisease: false,
+        eyeDisease: false,
+        entDisease: false,
+        pacemakerPresence: false,
+        epilepsy: false,
+        //
+        injury: false,
+        operations: false,
+        bloodTransfusion: false,
+        concussion: false,
+        radiationChemoTherapy: false,
+        //
+        allergy: {
+          antibiotics: false,
+          iodinePreparations: false,
+          hormonalPreparations: false,
+          pollen: false,
+          foodProducts: false,
+          animal: false,
+        },
+        smoking: false,
+        pregnancy: false,
+        lactation: false,
+        contraceptives: false,
+      }).then(async (info) => {
+        await UserModel.findByIdAndUpdate(user._id, { $set: { userInfo: info._id } });
+      }),
+    );
   }
   await Promise.all(promises);
 
@@ -163,7 +199,7 @@ export const logout = async (dto: RefreshTokenRequestDto): Promise<void> => {
     throw new BadRequestError('Token is expired');
   return deleteRefreshSession(dto.refreshToken);
 };
-export const refresh = async (dto: RefreshTokenRequestDto): Promise<LoginResponseDto> => {
+export const refresh = async (dto: RefreshTokenRequestDto): Promise<AuthResponseDto> => {
   const oldRefreshSession = await getRefreshSession(dto.refreshToken);
 
   if (!(await verifyRefreshSession(oldRefreshSession)))
@@ -182,9 +218,7 @@ export const refresh = async (dto: RefreshTokenRequestDto): Promise<LoginRespons
   await addRefreshSession(refreshSession);
   return { accessToken, refreshToken: refreshSession.token };
 };
-export const confirmation = async (
-  dto: ConfirmCodeRequestDto,
-): Promise<RegistrationResponseDto> => {
+export const confirmation = async (dto: ConfirmCodeRequestDto): Promise<AuthMessageResponseDto> => {
   const savedUser = await UserModel.findOne({ email: dto.email });
   const savedConfirmSession = await ConfirmSessionModel.findOne(
     { token: dto.token },
@@ -210,7 +244,7 @@ export const confirmation = async (
     return { userId: savedUser._id.toString(), message: 'Ваш аккаунт успешно верифицирован' };
   }
 };
-export const resend = async (dto: ResendCodeRequestDto): Promise<RegistrationResponseDto> => {
+export const resend = async (dto: ResendCodeRequestDto): Promise<AuthMessageResponseDto> => {
   const savedUser = await UserModel.findOne({ email: dto.email }).lean();
   if (!savedUser) throw new BadRequestError('Пользователь с такой почтой не зарегистрирован ');
   else if (savedUser.isVerified)
@@ -231,3 +265,5 @@ export const resend = async (dto: ResendCodeRequestDto): Promise<RegistrationRes
     };
   }
 };
+{
+}

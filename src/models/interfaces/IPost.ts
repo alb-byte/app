@@ -1,8 +1,12 @@
 import { Types } from 'mongoose';
 
 export interface IPost {
-  userId: Types.ObjectId;
+  user: Types.ObjectId;
   title: string;
   body: string;
   image: string;
+  likes: Array<Types.ObjectId>;
+  comments: Array<Types.ObjectId>;
+  createdAt: Date;
+  updatedAt: Date;
 }

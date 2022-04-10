@@ -33,7 +33,7 @@ export const edit = (
   const user = req.user as TokenData;
 
   ProfileService.edit(user.id, req.body)
-    .then((dto) => res.json(dto))
+    .then(() => res.sendStatus(204))
     .catch(next);
 };
 export const editInfo = (
@@ -47,14 +47,14 @@ export const editInfo = (
     const isValid = validateDoctorInfoDto(req.body);
     if (!isValid) return next(validateDoctorInfoDto.errors);
     ProfileService.editDoctorInfo(user.id, payload)
-      .then((dto) => res.json(dto))
+      .then(() => res.sendStatus(204))
       .catch(next);
   } else {
     const payload = req.body as EditPacientInfoDto;
     const isValid = validatePacientInfoDto(req.body);
     if (!isValid) return next(validatePacientInfoDto.errors);
     ProfileService.editPacientInfo(user.id, payload)
-      .then((dto) => res.json(dto))
+      .then(() => res.sendStatus(204))
       .catch(next);
   }
 };

@@ -1,7 +1,6 @@
 import { CommentModel } from './Comment';
 import { ConfirmSessionModel } from './ConfirmSession';
 import { DoctorInfoModel } from './DoctorInfo';
-import { LikeModel } from './Like';
 import { PacientInfoModel } from './PacientInfo';
 import { RatingModel } from './Rating';
 import { RefreshSessionModel } from './RefreshSession';
@@ -16,7 +15,6 @@ export {
   CommentModel,
   ConfirmSessionModel,
   DoctorInfoModel,
-  LikeModel,
   PacientInfoModel,
   RatingModel,
   RefreshSessionModel,

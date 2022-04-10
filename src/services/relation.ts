@@ -1,7 +1,6 @@
 import createHttpError from 'http-errors';
-import { Types } from 'mongoose';
 import { UserModel } from '../models/models';
-import { ItemList } from '../newLib/dto';
+import { ItemListResponseDto } from '../newLib/dto';
 import { UserPreviewResponseDto } from '../newLib/dto/user/UserPreviewResponseDto';
 import { UserType } from '../newLib/enums';
 import { UserRelation } from '../newLib/enums/UserRelation';
@@ -10,27 +9,29 @@ const PAGE_SIZE = 5;
 export const getSubscriptions = async (
   authUserId: string,
   page: number,
-): Promise<ItemList<UserPreviewResponseDto>> => {
+): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
   const result = await Promise.all([
     UserModel.findById(authUserId, {
       subscriptions: 1,
-    }).populate<{
-      subscriptions: Array<{
-        _id: string;
-        firstName: string;
-        lastName: string;
-        avatar: string | null;
-        userType: UserType;
-      }>;
-    }>({
-      path: 'subscriptions',
-      select: '_id firstName lastName avatar userType',
-      options: {
-        limit: PAGE_SIZE,
-        sort: { firstName: -1 },
-        skip: (page - 1) * PAGE_SIZE,
-      },
-    }),
+    })
+      .populate<{
+        subscriptions: Array<{
+          _id: string;
+          firstName: string;
+          lastName: string;
+          avatar: string | null;
+          userType: UserType;
+        }>;
+      }>({
+        path: 'subscriptions',
+        select: '_id firstName lastName avatar userType',
+        options: {
+          limit: PAGE_SIZE,
+          sort: { firstName: -1 },
+          skip: (page - 1) * PAGE_SIZE,
+        },
+      })
+      .lean(),
     UserModel.findById(authUserId, { subscriptions: 1 }),
   ]);
   if (result[0] && result[1])
@@ -43,7 +44,7 @@ export const getSubscriptions = async (
 export const getSubscribers = async (
   authUserId: string,
   page: number,
-): Promise<ItemList<UserPreviewResponseDto>> => {
+): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
   const result = await Promise.all([
     UserModel.findById(authUserId, {
       subscriptions: 1,
@@ -76,7 +77,7 @@ export const getSubscribers = async (
 export const getFriends = async (
   authUserId: string,
   page: number,
-): Promise<ItemList<UserPreviewResponseDto>> => {
+): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
   const result = await Promise.all([
     UserModel.findById(authUserId, {
       friends: 1,

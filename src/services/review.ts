@@ -1,5 +1,5 @@
 import { ReviewModel } from '../models/models';
-import { ItemList } from '../newLib/dto';
+import { ItemListResponseDto } from '../newLib/dto';
 const PAGE_SIZE = 5;
 
 export const getOneReview = async (
@@ -13,7 +13,7 @@ export const getManyReview = async (
   authUserId: string,
   userId: string,
   page: number,
-): Promise<ItemList<any>> => {
+): Promise<ItemListResponseDto<any>> => {
   const review = await ReviewModel.find(
     { doctorId: userId },
     {},

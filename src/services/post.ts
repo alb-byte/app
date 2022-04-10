@@ -1,57 +1,102 @@
-import GetUserPostsDto from '../models/request/post/GetUserPostsDto';
-import UpdatePostDto from '../models/request/post/UpdatePostDto';
-import CreatePostDto from '../models/request/post/CreatePostDto';
-import { AuthorizationError, NotFoundError } from '../models/exception/httpError';
+import { NotFoundError } from '../models/exception/httpError';
 import { PostModel } from '../models/models/Post';
-import { IPost } from '../models/interfaces';
+import { IUser } from '../models/interfaces';
 import { FeedModel, UserModel } from '../models/models';
+import { CreatePostRequestDto, GetUserPostsQuery, UpdatePostRequestDto } from '../newLib/dto/post';
+import { ItemListResponseDto, PostResponseDto } from '../newLib/dto';
+import { Types } from 'mongoose';
 const PAGE_SIZE = 5;
-interface PostListResponse {
-  totalCount: number;
-  posts: Array<IPost>;
-}
-export const getMany = async (dto: GetUserPostsDto): Promise<PostListResponse> => {
-  const page = parseInt(dto.page) || 1;
-  const posts = await PostModel.find({ userId: dto.userId })
-    .sort({ _id: -1 })
-    .limit(PAGE_SIZE)
-    .skip(PAGE_SIZE * (page - 1))
+
+export const getMany = async (
+  authUserId: string,
+  query: GetUserPostsQuery,
+): Promise<ItemListResponseDto<PostResponseDto>> => {
+  const page = query.page || 1;
+  const results = await Promise.all([
+    PostModel.find({ userId: query.userId })
+      .sort({ _id: -1 })
+      .limit(PAGE_SIZE)
+      .skip(PAGE_SIZE * (page - 1))
+      .populate<Pick<PostResponseDto, 'user'>>('user', {
+        _id: true,
+        firstName: true,
+        lastName: true,
+        avatar: true,
+      })
+      .lean(),
+    PostModel.countDocuments({ userId: query.userId }),
+  ]);
+
+  return {
+    totalCount: results[1],
+    items: results[0].map((i) => ({
+      ...i,
+      _id: i._id.toString(),
+      likes: i.likes.length,
+      comments: i.comments.length,
+      isLiked: i.likes.map((i) => i.toString()).includes(authUserId),
+    })),
+  };
+};
+export const getOne = async (authUserId: string, postId: string): Promise<PostResponseDto> => {
+  const post = await PostModel.findById(postId)
+    .populate<Pick<PostResponseDto, 'user'>>('user', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
     .lean();
-  const totalCount = await PostModel.countDocuments({ userId: dto.userId });
-  return { totalCount, posts };
+  if (!post) throw new NotFoundError('Post not found');
+  return {
+    ...post,
+    _id: post._id.toString(),
+    likes: post.likes.length,
+    comments: post.comments.length,
+    isLiked: post.likes.map((i) => i.toString()).includes(authUserId),
+  };
 };
-export const getOne = async (id: string): Promise<IPost | null> => {
-  const post = await PostModel.findById(id).lean();
-  return post;
-};
-export const create = async (authUserId: string, dto: CreatePostDto): Promise<IPost> => {
-  const post = new PostModel({ ...dto, userId: authUserId });
-  const user = await UserModel.findById(authUserId, { friends: 1, subscribers: 1 }).lean();
-  if (user) {
-    const feedItems = [...user.friends, ...user.subscribers].map(
-      (i) => new FeedModel({ userId: i, postId: post.id }),
+export const create = async (
+  authUserId: string,
+  dto: CreatePostRequestDto,
+): Promise<PostResponseDto> => {
+  const authUser = await UserModel.findById<
+    Pick<IUser, 'firstName' | 'lastName' | 'avatar' | 'friends' | 'subscribers'> & {
+      _id: Types.ObjectId;
+    }
+  >(authUserId, {
+    _id: true,
+    firstName: true,
+    lastName: true,
+    avatar: true,
+    friends: true,
+    subscribers: true,
+  }).lean();
+  if (authUser) {
+    const post = await PostModel.create({ ...dto, user: authUserId });
+    const { friends, subscribers, ...author } = authUser;
+    const { likes, comments, user, ...postData } = post.toObject();
+    const feedItems = [...authUser.friends, ...authUser.subscribers].map(
+      (i) => new FeedModel({ user: i, post: post.id }),
     );
     await FeedModel.insertMany(feedItems);
-  }
-  await post.save();
-  return post;
+    return {
+      ...postData,
+      _id: postData._id.toString(),
+      user: { ...author, _id: authUserId },
+      likes: 0,
+      comments: 0,
+      isLiked: false,
+    };
+  } else throw new NotFoundError('Post not found');
 };
-export const update = async (authUserId: string, dto: UpdatePostDto): Promise<IPost | null> => {
-  const { _id, ...newPostData } = dto;
-  const postInDb = await PostModel.findById(_id, { userId: true });
-  if (!postInDb) throw new NotFoundError('Post not found');
-  if (postInDb.userId.toString() !== authUserId) throw new AuthorizationError('Error');
-  else {
-    const post = await PostModel.findByIdAndUpdate(_id, newPostData, { new: true }).lean();
-    return post;
-  }
+export const update = async (
+  authUserId: string,
+  postId: string,
+  dto: UpdatePostRequestDto,
+): Promise<void> => {
+  await PostModel.findByIdAndUpdate(postId, dto);
 };
-export const remove = async (authUserId: string, id: string): Promise<IPost | null> => {
-  const postInDb = await PostModel.findById(id, { userId: true });
-  if (!postInDb) throw new NotFoundError('Post not found');
-  if (postInDb.userId.toString() !== authUserId) throw new AuthorizationError('Error');
-  else {
-    const post = await PostModel.findByIdAndRemove(id, { new: true }).lean();
-    return post;
-  }
+export const remove = async (authUserId: string, postId: string): Promise<void> => {
+  await Promise.all([PostModel.findByIdAndDelete(postId), FeedModel.deleteMany({ post: postId })]);
 };

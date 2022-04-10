@@ -16,7 +16,7 @@ const config = {
     maxRefreshSessionsCount: 3,
   },
   mail: {
-    from: 'healthapp@gmail.com',
+    from: 'happ20212022@gmail.com',
     user: `${process.env.EMAIL_USER}`,
     password: `${process.env.EMAIL_PASSWORD}`,
   },

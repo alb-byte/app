@@ -1,8 +1,3 @@
-import { GetManyDto as GetManyCommentsDto } from './comment/GetManyDto';
-import { GetOneDto as GetOneCommentDto } from './comment/GetOneDto';
-import { CreateDto as CreateCommentDto } from './comment/CreateDto';
-import { UpdateDto as UpdateCommentDto } from './comment/UpdateDto';
-import { RemoveDto as RemoveCommentDto } from './comment/RemoveDto';
 import { GetManyDto as GetFeedCommentDto } from './feed/GetManyDto';
 import { GetOneDto as GetOnePostDto } from './profile/GetOneDto';
 import { UserIdDto } from './general/UserIdDto';
@@ -17,13 +12,11 @@ import { SpecialityParamsDto } from './speciality/SpecialityParamsDto';
 import { SpecialityBodyDto } from './speciality/SpecialityBodyDto';
 import { UniversityParamsDto } from './university/UniversityParamsDto';
 import { UniversityBodyDto } from './university/UniversityBodyDto';
+//
+import { ItemListResponseDto } from './general/ItemListResponseDto';
+import { PostResponseDto } from './post/PostResponseDto';
 
 export {
-  GetManyCommentsDto,
-  GetOneCommentDto,
-  CreateCommentDto,
-  UpdateCommentDto,
-  RemoveCommentDto,
   GetFeedCommentDto,
   GetOnePostDto,
   UserIdDto,
@@ -38,9 +31,6 @@ export {
   SpecialityBodyDto,
   UniversityParamsDto,
   UniversityBodyDto,
+  ItemListResponseDto,
+  PostResponseDto,
 };
-
-export interface ItemList<T> {
-  totalCount: number;
-  items: Array<T>;
-}

@@ -1,7 +1,7 @@
 import { IUniversity } from '../models/interfaces';
 import { UniversityModel } from '../models/models';
 
-export const getMany = async (): Promise<Array<IUniversity> | null> => {
+export const getMany = async (): Promise<Array<IUniversity>> => {
   const universities = await UniversityModel.find({}).lean();
   return universities;
 };

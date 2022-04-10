@@ -2,9 +2,9 @@ import { Types } from 'mongoose';
 
 export interface IComment {
   _id: Types.ObjectId;
-  userId: Types.ObjectId;
-  postId: Types.ObjectId;
+  user: Types.ObjectId;
+  post: Types.ObjectId;
   body: string;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

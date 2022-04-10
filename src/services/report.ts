@@ -1,5 +1,5 @@
 import { ReportModel } from '../models/models';
-import { ItemList } from '../newLib/dto';
+import { ItemListResponseDto } from '../newLib/dto';
 const PAGE_SIZE = 5;
 
 export const getOneReport = async (
@@ -13,7 +13,7 @@ export const getManyReport = async (
   authUserId: string,
   userId: string,
   page: number,
-): Promise<ItemList<any>> => {
+): Promise<ItemListResponseDto<any>> => {
   const reports = await ReportModel.find(
     {},
     {},

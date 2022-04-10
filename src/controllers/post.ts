@@ -1,66 +1,56 @@
 import { NextFunction, Request, Response } from 'express';
 import * as PostService from '../services/post';
-import GetUserPostsDto, {
-  validate as validateGetUserPostsDto,
-} from '../models/request/post/GetUserPostsDto';
-import GetPostDto, { validate as validateGetPostDto } from '../models/request/post/GetPostDto';
-import UpdatePostDto, {
-  validate as validateUpdatePostDto,
-} from '../models/request/post/UpdatePostDto';
-import CreatePostDto, {
-  validate as validateCreatePostDto,
-} from '../models/request/post/CreatePostDto';
 import { TokenData } from '../models/request/TokenData';
+import { CreatePostRequestDto, GetUserPostsQuery, UpdatePostRequestDto } from '../newLib/dto/post';
 
-export const getMany = (req: Request, res: Response, next: NextFunction): void => {
-  const query = req.query as unknown as GetUserPostsDto;
-  const isValid = validateGetUserPostsDto(query);
-  if (!isValid) return next(validateGetUserPostsDto.errors);
-
-  PostService.getMany(query)
+export const getMany = (
+  req: Request<unknown, unknown, unknown, GetUserPostsQuery>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const user = req.user as TokenData;
+  PostService.getMany(user.id, req.query)
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const getOne = (req: Request<GetPostDto>, res: Response, next: NextFunction): void => {
-  const isValid = validateGetPostDto(req.params);
-  if (!isValid) return next(validateGetPostDto.errors);
-
-  PostService.getOne(req.params.id)
+export const getOne = (
+  req: Request<{ postId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const user = req.user as TokenData;
+  PostService.getOne(user.id, req.params.postId)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const create = (
-  req: Request<unknown, CreatePostDto>,
+  req: Request<unknown, CreatePostRequestDto>,
   res: Response,
   next: NextFunction,
 ): void => {
-  const isValid = validateCreatePostDto(req.body);
-  if (!isValid) return next(validateCreatePostDto.errors);
   const user = req.user as TokenData;
-
   PostService.create(user.id, req.body)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const update = (
-  req: Request<unknown, UpdatePostDto>,
+  req: Request<{ postId: string }, UpdatePostRequestDto>,
   res: Response,
   next: NextFunction,
 ): void => {
-  const isValid = validateUpdatePostDto(req.body);
-  if (!isValid) return next(validateUpdatePostDto.errors);
   const user = req.user as TokenData;
-
-  PostService.update(user.id, req.body)
-    .then((dto) => res.json(dto))
+  PostService.update(user.id, req.params.postId, req.body)
+    .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const remove = (req: Request<GetPostDto>, res: Response, next: NextFunction): void => {
-  const isValid = validateGetPostDto(req.params);
-  if (!isValid) return next(validateGetPostDto.errors);
+export const remove = (
+  req: Request<{ postId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
   const user = req.user as TokenData;
 
-  PostService.remove(user.id, req.params.id)
-    .then((dto) => res.json(dto))
+  PostService.remove(user.id, req.params.postId)
+    .then(() => res.sendStatus(204))
     .catch(next);
 };

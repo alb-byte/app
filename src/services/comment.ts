@@ -1,32 +1,97 @@
-import { CommentModel } from '../models/models';
-import { ItemList } from '../newLib/dto';
+import { NotFoundError } from '../models/exception/httpError';
+import { IUser } from '../models/interfaces';
+import { CommentModel, UserModel } from '../models/models';
+import { ItemListResponseDto } from '../newLib/dto';
+import { CommentResponseDto } from '../newLib/dto/comment/CommentResponseDto';
+import { CreateCommentRequestDto } from '../newLib/dto/comment/CreateCommentRequestDto';
+import { Types } from 'mongoose';
+import { PostModel } from '../models/models/Post';
+
 const PAGE_SIZE = 5;
 
-export const getOne = async (commentId: string): Promise<any> => {
-  return CommentModel.findById(commentId);
+export const getOne = async (commentId: string): Promise<CommentResponseDto> => {
+  const comment = await CommentModel.findById(commentId)
+    .populate<Pick<CommentResponseDto, 'user'>>('user', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
+    .lean();
+  if (!comment) throw new NotFoundError('Post not found');
+  return {
+    ...comment,
+    _id: comment._id.toString(),
+    post: comment.post.toString(),
+  };
 };
-export const getMany = async (postId: string, page: number): Promise<ItemList<any>> => {
+export const getMany = async (
+  postId: string,
+  page: number,
+): Promise<ItemListResponseDto<CommentResponseDto>> => {
   const comments = await CommentModel.find(
     { postId },
     {},
     { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: 'createdAt' },
-  );
+  )
+    .populate<Pick<CommentResponseDto, 'user'>>('user', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
+    .lean();
   const totalCount = await CommentModel.countDocuments({ postId });
   return {
-    items: comments,
+    items: comments.map((comment) => ({
+      ...comment,
+      _id: comment._id.toString(),
+      post: comment.post.toString(),
+    })),
     totalCount,
   };
 };
-export const create = async (authUserId: string, postId: string, body: string): Promise<any> => {
-  return CommentModel.create({ postId, userId: authUserId, body });
+export const create = async (
+  authUserId: string,
+  postId: string,
+  dto: CreateCommentRequestDto,
+): Promise<CommentResponseDto> => {
+  const authUser = await UserModel.findById<
+    Pick<IUser, 'firstName' | 'lastName' | 'avatar'> & {
+      _id: Types.ObjectId;
+    }
+  >(authUserId, {
+    _id: true,
+    firstName: true,
+    lastName: true,
+    avatar: true,
+  }).lean();
+  const comment = await CommentModel.create({ post: postId, user: authUserId, body: dto.body });
+  await PostModel.findByIdAndUpdate(postId, { $push: { comments: comment._id } });
+  if (authUser) {
+    return {
+      ...comment.toObject(),
+      user: { ...authUser, _id: authUser._id.toString() },
+      _id: comment._id.toString(),
+      post: comment.post.toString(),
+    };
+  }
+  throw new NotFoundError('Post not found');
 };
 export const update = async (
   authpostId: string,
   commentId: string,
-  body: string,
+  dto: CreateCommentRequestDto,
 ): Promise<void> => {
-  await CommentModel.findByIdAndUpdate(commentId, { body });
+  await CommentModel.findByIdAndUpdate(commentId, { body: dto.body });
 };
-export const remove = async (authUserId: string, commentId: string): Promise<void> => {
-  await CommentModel.findByIdAndDelete(commentId);
+export const remove = async (
+  authUserId: string,
+  postId: string,
+  commentId: string,
+): Promise<void> => {
+  await Promise.all([
+    CommentModel.findByIdAndDelete(commentId),
+    PostModel.findByIdAndUpdate(postId, { $pull: { comments: new Types.ObjectId(commentId) } }),
+  ]);
 };

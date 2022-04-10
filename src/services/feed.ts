@@ -1,29 +1,49 @@
 import { FeedModel } from '../models/models';
-import { ItemList } from '../newLib/dto';
+import { ItemListResponseDto, PostResponseDto } from '../newLib/dto';
+import { Types } from 'mongoose';
 const PAGE_SIZE = 10;
-export const getMany = async (authUserId: string, page: number): Promise<ItemList<any>> => {
-  const posts = await FeedModel.find({ userId: authUserId }, { postId: 1 })
+export const getMany = async (
+  authUserId: string,
+  page: number,
+): Promise<ItemListResponseDto<PostResponseDto>> => {
+  const posts = await FeedModel.find({ userId: authUserId }, { _id: false, user: false })
     .populate<{
-      postId: Array<{
-        _id: string;
-        userId: string;
+      post: {
+        _id: Types.ObjectId;
         title: string;
         body: string;
         image: string;
-      }>;
+        likes: Array<Types.ObjectId>;
+        comments: Array<Types.ObjectId>;
+        createdAt: Date;
+        updatedAt: Date;
+        user: { _id: Types.ObjectId; firstName: string; lastName: string; avatar: string | null };
+      };
     }>({
-      path: 'postId',
-      select: '_id image body title userId',
+      path: 'post',
       options: {
         limit: PAGE_SIZE,
         sort: { createdAt: 1 },
         skip: (page - 1) * PAGE_SIZE,
       },
+      populate: { path: 'user', select: '_id firstName lastName avatar' },
     })
     .lean();
   const totalCount = await FeedModel.countDocuments({ userId: authUserId });
   return {
-    items: posts.map((post) => post.postId),
+    items: posts.map((i) => {
+      return {
+        ...i.post,
+        _id: i.post._id.toString(),
+        likes: i.post.likes.length,
+        comments: i.post.comments.length,
+        isLiked: i.post.likes.map((i) => i.toString()).includes(authUserId),
+        user: {
+          ...i.post.user,
+          _id: i.post.user._id.toString(),
+        },
+      };
+    }),
     totalCount,
   };
 };
