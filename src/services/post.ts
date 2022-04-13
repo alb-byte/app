@@ -76,7 +76,7 @@ export const create = async (
     const post = await PostModel.create({ ...dto, user: authUserId });
     const { friends, subscribers, ...author } = authUser;
     const { likes, comments, user, ...postData } = post.toObject();
-    const feedItems = [...authUser.friends, ...authUser.subscribers].map(
+    const feedItems = [...authUser.friends, ...authUser.subscribers, authUser._id].map(
       (i) => new FeedModel({ user: i, post: post.id }),
     );
     await FeedModel.insertMany(feedItems);

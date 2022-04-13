@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReportService from '../services/report';
 import { TokenData } from '../models/TokenData';
-import { PageDto, ReportBodyDto, ReportParamsDto } from '../dto';
+import { PageDto, ReportBodyDto } from '../dto';
 
 export const getMany = (
   req: Request<{ userId: string }, unknown, unknown, PageDto>,
@@ -13,7 +13,11 @@ export const getMany = (
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const getOne = (req: Request<ReportParamsDto>, res: Response, next: NextFunction): void => {
+export const getOne = (
+  req: Request<{ userId: string; reportId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
   const user = req.user as TokenData;
   ReportService.getOneReport(user.id, req.params.userId, req.params.reportId)
     .then((dto) => res.json(dto))
@@ -30,7 +34,7 @@ export const create = (
     .catch(next);
 };
 export const update = (
-  req: Request<ReportParamsDto, unknown, ReportBodyDto>,
+  req: Request<{ userId: string; reportId: string }, unknown, ReportBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -39,7 +43,11 @@ export const update = (
     .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const remove = (req: Request<ReportParamsDto>, res: Response, next: NextFunction): void => {
+export const remove = (
+  req: Request<{ userId: string; reportId: string }>,
+  res: Response,
+  next: NextFunction,
+): void => {
   const user = req.user as TokenData;
   ReportService.removeReport(user.id, req.params.reportId)
     .then(() => res.sendStatus(204))

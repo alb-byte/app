@@ -2,7 +2,7 @@ import createHttpError from 'http-errors';
 import { UserModel } from '../models/entities';
 import { ItemListResponseDto } from '../dto';
 import { UserPreviewResponseDto } from '../dto/user/UserPreviewResponseDto';
-import { UserType } from '../enums';
+import { Sex, UserType } from '../enums';
 import { UserRelation } from '../enums/UserRelation';
 const PAGE_SIZE = 5;
 
@@ -21,10 +21,11 @@ export const getSubscriptions = async (
           lastName: string;
           avatar: string | null;
           userType: UserType;
+          sex: Sex;
         }>;
       }>({
         path: 'subscriptions',
-        select: '_id firstName lastName avatar userType',
+        select: '_id firstName lastName avatar userType sex',
         options: {
           limit: PAGE_SIZE,
           sort: { firstName: -1 },
@@ -48,23 +49,26 @@ export const getSubscribers = async (
   const result = await Promise.all([
     UserModel.findById(authUserId, {
       subscriptions: 1,
-    }).populate<{
-      subscribers: Array<{
-        _id: string;
-        firstName: string;
-        lastName: string;
-        avatar: string | null;
-        userType: UserType;
-      }>;
-    }>({
-      path: 'subscribers',
-      select: '_id firstName lastName avatar userType',
-      options: {
-        limit: PAGE_SIZE,
-        sort: { firstName: -1 },
-        skip: (page - 1) * PAGE_SIZE,
-      },
-    }),
+    })
+      .populate<{
+        subscribers: Array<{
+          _id: string;
+          firstName: string;
+          lastName: string;
+          avatar: string | null;
+          userType: UserType;
+          sex: Sex;
+        }>;
+      }>({
+        path: 'subscribers',
+        select: '_id firstName lastName avatar userType sex',
+        options: {
+          limit: PAGE_SIZE,
+          sort: { firstName: -1 },
+          skip: (page - 1) * PAGE_SIZE,
+        },
+      })
+      .lean(),
     UserModel.findById(authUserId, { subscribers: 1 }),
   ]);
   if (result[0] && result[1])
@@ -89,10 +93,11 @@ export const getFriends = async (
           lastName: string;
           avatar: string | null;
           userType: UserType;
+          sex: Sex;
         }>;
       }>({
         path: 'friends',
-        select: '_id firstName lastName avatar userType',
+        select: '_id firstName lastName avatar userType sex',
         options: {
           limit: PAGE_SIZE,
           sort: { firstName: -1 },

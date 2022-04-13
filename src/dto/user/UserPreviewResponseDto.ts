@@ -1,4 +1,4 @@
-import { UserType } from '../../enums';
+import { Sex, UserType } from '../../enums';
 import { UserRelation } from '../../enums/UserRelation';
 
 export interface UserPreviewResponseDto {
@@ -7,5 +7,6 @@ export interface UserPreviewResponseDto {
   lastName: string;
   avatar: string | null;
   userType: UserType;
+  sex: Sex;
   relation: UserRelation;
 }

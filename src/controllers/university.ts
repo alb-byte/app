@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as UniversityService from '../services/university';
-import { UniversityBodyDto, UniversityParamsDto } from '../dto';
+import { UniversityBodyDto } from '../dto';
 
 export const getAll = (req: Request, res: Response, next: NextFunction): void => {
   UniversityService.getMany()
@@ -8,7 +8,7 @@ export const getAll = (req: Request, res: Response, next: NextFunction): void =>
     .catch(next);
 };
 export const getOne = (
-  req: Request<UniversityParamsDto>,
+  req: Request<{ universityId: string }>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -26,7 +26,7 @@ export const create = (
     .catch(next);
 };
 export const update = (
-  req: Request<UniversityParamsDto, unknown, UniversityBodyDto>,
+  req: Request<{ universityId: string }, unknown, UniversityBodyDto>,
   res: Response,
   next: NextFunction,
 ): void => {
@@ -35,7 +35,7 @@ export const update = (
     .catch(next);
 };
 export const remove = (
-  req: Request<UniversityParamsDto>,
+  req: Request<{ universityId: string }>,
   res: Response,
   next: NextFunction,
 ): void => {
