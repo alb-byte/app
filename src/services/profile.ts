@@ -107,7 +107,7 @@ export const getOne = async (authUserId: string, userId: string): Promise<UserRe
   } else {
     const allDoctorInfo = await Promise.all([
       DoctorInfoModel.findOne<DoctorInfoDto>(
-        { userId: user._id },
+        { user: user._id },
         {
           createdAt: 0,
           updatedAt: 0,
@@ -187,7 +187,7 @@ export const edit = async (userId: string, dto: EditProfileRequestDto): Promise<
 
 export const editDoctorInfo = async (userId: string, dto: DoctorInfoDto): Promise<void> => {
   const userInfoFromDb = await DoctorInfoModel.findOneAndUpdate(
-    { userId },
+    { user: userId },
     {
       ...dto,
     },

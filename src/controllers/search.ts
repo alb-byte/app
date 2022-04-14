@@ -14,7 +14,6 @@ export const searchDoctor = (
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-
   SearchService.searchDoctor(user.id, req.body)
     .then((dto) => res.json(dto))
     .catch(next);

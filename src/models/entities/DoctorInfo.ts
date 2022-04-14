@@ -3,7 +3,7 @@ import { AcademicDegree, DoctorCategory, DoctorType } from '../../enums';
 import { IDoctorInfo } from '../interfaces';
 const DoctorInfoSchema = new Schema<IDoctorInfo>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     address: {
       type: Schema.Types.String,
     },

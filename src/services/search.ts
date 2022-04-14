@@ -1,12 +1,15 @@
 import _ from 'lodash';
-import { IUser } from '../models/interfaces';
-import { UserModel } from '../models/entities';
+import { Types } from 'mongoose';
+import { DoctorInfoModel, UserModel } from '../models/entities';
+import { UserPreviewResponseDto } from '../dto/user/UserPreviewResponseDto';
+import { ItemListResponseDto } from '../dto';
+import { UserType } from '../enums';
+import { SearchDoctorRequestDto } from '../dto/user/SearchDoctorRequestDto';
 const PAGE_SIZE = 5;
-interface SearchUsersResponse {
-  totalCount: number;
-  users: Array<IUser>;
-}
-export const searchUser = async (authUserId: string, dto: any): Promise<SearchUsersResponse> => {
+export const searchUser = async (
+  authUserId: string,
+  dto: any,
+): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
   const page = dto.page || 1;
   const termFilter = dto.fullName && {
     $expr: {
@@ -20,72 +23,121 @@ export const searchUser = async (authUserId: string, dto: any): Promise<SearchUs
   const predicate = termFilter
     ? { $and: [termFilter, { _id: { $ne: authUserId } }] }
     : { _id: { $ne: authUserId } };
-  const users = await UserModel.find(predicate, {
+  const users = await UserModel.find<UserPreviewResponseDto>(predicate, {
     _id: 1,
     firstName: 1,
     lastName: 1,
     avatar: 1,
-    isDoctor: 1,
+    userType: 1,
+    sex: 1,
   })
     .sort({ firstName: -1 })
     .skip((page - 1) * PAGE_SIZE)
     .limit(PAGE_SIZE);
   const totalCount = await UserModel.countDocuments(predicate);
-  return {
-    users,
-    totalCount,
-  };
+  return { items: users, totalCount };
 };
 
-export const searchDoctor = async (authUserId: string, dto: any): Promise<SearchUsersResponse> => {
-  const { page, fullName, ...search } = dto;
+export const searchDoctor = async (
+  authUserId: string,
+  dto: SearchDoctorRequestDto & { page: number },
+): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
+  const { page, fullName, sex, ...search } = dto;
   const pageNumber = page || 1;
-  const termFilter = fullName && {
-    $expr: {
-      $regexMatch: {
-        input: { $concat: ['$firstName', ' ', '$lastName'] },
-        regex: '.*' + fullName + '.*',
-        options: 'i',
+  const userFilters: Array<any> = [
+    {
+      user: { $ne: authUserId },
+    },
+    {
+      userType: UserType.DOCTOR,
+    },
+  ];
+  if (fullName)
+    userFilters.push({
+      $expr: {
+        $regexMatch: {
+          input: { $concat: ['$firstName', ' ', '$lastName'] },
+          regex: '.*' + fullName + '.*',
+          options: 'i',
+        },
+      },
+    });
+  const doctorFilters: Array<any> = [];
+  if (dto.speciality)
+    doctorFilters.push({
+      $or: [
+        { firstSpeciality: new Types.ObjectId(dto.speciality) },
+        { secondSpeciality: new Types.ObjectId(dto.speciality) },
+      ],
+    });
+  if (dto.academicDegree) doctorFilters.push({ academicDegree: dto.academicDegree });
+  if (dto.category) doctorFilters.push({ category: dto.category });
+  if (dto.type) doctorFilters.push({ type: dto.type });
+  if (dto.universityGraduationYear)
+    doctorFilters.push({ universityGraduationYear: dto.universityGraduationYear });
+  if (dto.university) doctorFilters.push({ university: new Types.ObjectId(dto.university) });
+  const usersData = await DoctorInfoModel.aggregate([
+    {
+      $match: {
+        $and: doctorFilters,
       },
     },
-  };
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'user',
+        foreignField: '_id',
+        as: 'fromUsers',
+      },
+    },
+    {
+      $replaceRoot: { newRoot: { $mergeObjects: [{ $arrayElemAt: ['$fromUsers', 0] }, '$$ROOT'] } },
+    },
+    { $project: { fromUsers: 0 } },
+    { $match: { $and: userFilters } },
+    {
+      $addFields: {
+        totalCount: { $sum: {} },
+      },
+    },
 
-  const doctorInfoFilterIsExists = !_.isEmpty(search);
-  const doctorInfoFilter = {};
-  if (doctorInfoFilterIsExists) {
-    _.forOwn(search, function (value, key) {
-      const propName = 'doctorInfo.' + key;
-      _.assign(doctorInfoFilter, { [propName]: value });
-    });
-  }
-  const globalFilter = doctorInfoFilterIsExists
-    ? {
-        isDoctor: true,
-        _id: { $ne: authUserId },
-        ...doctorInfoFilter,
-      }
-    : {
-        _id: { $ne: authUserId },
-        isDoctor: true,
-      };
-  const predicate = termFilter
-    ? {
-        $and: [termFilter, globalFilter],
-      }
-    : globalFilter;
-  const users = await UserModel.find(predicate, {
-    _id: 1,
-    firstName: 1,
-    lastName: 1,
-    avatar: 1,
-    isDoctor: 1,
-  })
-    .sort({ firstName: -1 })
-    .skip((pageNumber - 1) * PAGE_SIZE)
-    .limit(PAGE_SIZE);
-  const totalCount = await UserModel.countDocuments(predicate);
+    {
+      $facet: {
+        metadata: [
+          {
+            $group: {
+              _id: null,
+              total: { $sum: 1 },
+            },
+          },
+        ],
+        data: [
+          { $sort: { user: -1 } },
+          { $skip: PAGE_SIZE * (pageNumber - 1) },
+          { $limit: PAGE_SIZE },
+        ],
+      },
+    },
+    {
+      $project: {
+        data: 1,
+        total: { $arrayElemAt: ['$metadata.total', 0] },
+      },
+    },
+  ]);
+  const data = usersData[0];
   return {
-    users,
-    totalCount,
+    totalCount: data.total as number,
+    items: data.data.map((i: any) => {
+      return {
+        _id: i.user.toString(),
+        firstName: i.firstName,
+        lastName: i.lastName,
+        avatar: i.avatar,
+        userType: i.userType,
+        sex: i.sex,
+        // relation: UserRelation,
+      };
+    }),
   };
 };
