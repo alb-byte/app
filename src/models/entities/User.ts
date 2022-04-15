@@ -57,6 +57,7 @@ const UserSchema = new Schema<IUser>(
       type: Schema.Types.String,
     },
 
+    dialogs: [{ type: Schema.Types.ObjectId, ref: 'Dialog' }],
     friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     subscribers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     subscriptions: [{ type: Schema.Types.ObjectId, ref: 'User' }],

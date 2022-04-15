@@ -1,36 +1,106 @@
-import { ReportModel } from '../models/entities';
-import { ItemListResponseDto } from '../dto';
+import { ReportModel, UserModel } from '../models/entities';
+import { CreateReportRequestDto, ItemListResponseDto } from '../dto';
+import { ReportResponseDto } from '../dto/report/ReportResponseDto';
+import { NotFoundError } from '../exception/httpError';
+import { IUser } from '../models/interfaces';
+import { Types } from 'mongoose';
 const PAGE_SIZE = 5;
 
 export const getOneReport = async (
   authUserId: string,
   userId: string,
   reportId: string,
-): Promise<any> => {
-  return ReportModel.findById(reportId);
+): Promise<ReportResponseDto> => {
+  const report = await ReportModel.findById(reportId)
+    .populate<Pick<ReportResponseDto, 'sender'>>('sender', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
+    .populate<Pick<ReportResponseDto, 'user'>>('user', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
+    .lean();
+  if (!report) throw new NotFoundError('Post not found');
+  return {
+    ...report,
+    _id: report._id.toString(),
+  };
 };
 export const getManyReport = async (
   authUserId: string,
-  userId: string,
   page: number,
-): Promise<ItemListResponseDto<any>> => {
+): Promise<ItemListResponseDto<ReportResponseDto>> => {
   const reports = await ReportModel.find(
     {},
     {},
     { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: 'createdAt' },
-  );
-  const totalCount = await ReportModel.countDocuments({});
+  )
+    .populate<Pick<ReportResponseDto, 'user'>>('user', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
+    .populate<Pick<ReportResponseDto, 'sender'>>('sender', {
+      _id: true,
+      firstName: true,
+      lastName: true,
+      avatar: true,
+    })
+    .lean();
+  const totalCount = await ReportModel.countDocuments();
   return {
-    items: reports,
+    items: reports.map((report) => ({
+      ...report,
+      _id: report._id.toString(),
+    })),
     totalCount,
   };
 };
 export const addReport = async (
   authUserId: string,
-  userId: string,
-  reportDto: { body: string; isChecked: boolean },
-): Promise<any> => {
-  return ReportModel.create({ userId: authUserId, doctorId: userId, ...reportDto });
+  reportDto: CreateReportRequestDto,
+): Promise<ReportResponseDto> => {
+  const authUser = await UserModel.findById<
+    Pick<IUser, 'firstName' | 'lastName' | 'avatar'> & {
+      _id: Types.ObjectId;
+    }
+  >(authUserId, {
+    _id: true,
+    firstName: true,
+    lastName: true,
+    avatar: true,
+  }).lean();
+  const doc = await UserModel.findById<
+    Pick<IUser, 'firstName' | 'lastName' | 'avatar'> & {
+      _id: Types.ObjectId;
+    }
+  >(authUserId, {
+    _id: true,
+    firstName: true,
+    lastName: true,
+    avatar: true,
+  }).lean();
+  const report = await ReportModel.create({
+    sender: authUserId,
+    user: reportDto.userId,
+    body: reportDto.body,
+    isChecked: false,
+  });
+  if (authUser && doc) {
+    return {
+      ...report.toObject(),
+      sender: { ...authUser, _id: authUser._id.toString() },
+      user: { ...doc, _id: doc._id.toString() },
+      _id: report._id.toString(),
+    };
+  }
+  throw new NotFoundError('Post not found');
 };
 export const updateReport = async (
   authUserId: string,

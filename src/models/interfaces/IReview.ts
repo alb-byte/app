@@ -1,7 +1,9 @@
 import { Types } from 'mongoose';
 
 export interface IReview {
-  doctorId: Types.ObjectId;
-  userId: Types.ObjectId;
+  doctor: Types.ObjectId;
+  user: Types.ObjectId;
   body: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

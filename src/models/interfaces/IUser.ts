@@ -18,6 +18,7 @@ export interface IUser {
   createdAt: number;
   updatedAt: number;
 
+  dialogs: Types.Array<Types.ObjectId>;
   friends: Types.Array<Types.ObjectId>;
   subscribers: Types.Array<Types.ObjectId>;
   subscriptions: Types.Array<Types.ObjectId>;

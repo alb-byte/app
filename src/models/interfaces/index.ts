@@ -1,7 +1,6 @@
 import { IComment } from './IComment';
 import { IConfirmSession } from './IConfirmSession';
 import { IDoctorInfo } from './IDoctorInfo';
-import { ILike } from './ILike';
 import { IPacientInfo } from './IPacientInfo';
 import { IPost } from './IPost';
 import { IRating } from './IRating';
@@ -17,7 +16,6 @@ export {
   IComment,
   IConfirmSession,
   IDoctorInfo,
-  ILike,
   IPacientInfo,
   IPost,
   IRating,

@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import * as ReportService from '../services/report';
 import { TokenData } from '../models/TokenData';
-import { PageDto, ReportBodyDto } from '../dto';
+import { PageDto, CreateReportRequestDto } from '../dto';
 
 export const getMany = (
-  req: Request<{ userId: string }, unknown, unknown, PageDto>,
+  req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  ReportService.getManyReport(user.id, req.params.userId, req.query.page)
+  ReportService.getManyReport(user.id, req.query.page)
     .then((dto) => res.json(dto))
     .catch(next);
 };
@@ -24,17 +24,17 @@ export const getOne = (
     .catch(next);
 };
 export const create = (
-  req: Request<{ userId: string }, unknown, ReportBodyDto>,
+  req: Request<unknown, unknown, CreateReportRequestDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  ReportService.addReport(user.id, req.params.userId, req.body)
+  ReportService.addReport(user.id, req.body)
     .then((dto) => res.json(dto))
     .catch(next);
 };
 export const update = (
-  req: Request<{ userId: string; reportId: string }, unknown, ReportBodyDto>,
+  req: Request<{ userId: string; reportId: string }, unknown, any>,
   res: Response,
   next: NextFunction,
 ): void => {

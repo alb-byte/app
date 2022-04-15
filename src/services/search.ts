@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { isEmpty } from 'lodash';
 import { Types } from 'mongoose';
 import { DoctorInfoModel, UserModel } from '../models/entities';
 import { UserPreviewResponseDto } from '../dto/user/UserPreviewResponseDto';
@@ -79,7 +79,7 @@ export const searchDoctor = async (
   const usersData = await DoctorInfoModel.aggregate([
     {
       $match: {
-        $and: doctorFilters,
+        $and: !isEmpty(doctorFilters) ? doctorFilters : [{}],
       },
     },
     {
@@ -100,7 +100,6 @@ export const searchDoctor = async (
         totalCount: { $sum: {} },
       },
     },
-
     {
       $facet: {
         metadata: [

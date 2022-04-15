@@ -2,8 +2,8 @@ import { Schema, model } from 'mongoose';
 import { IReport } from '../interfaces';
 const ReportSchema = new Schema<IReport>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    doctorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     body: {
       type: Schema.Types.String,
       required: true,
@@ -13,6 +13,6 @@ const ReportSchema = new Schema<IReport>(
       required: true,
     },
   },
-  { versionKey: false },
+  { versionKey: false, timestamps: true },
 );
 export const ReportModel = model<IReport>('Report', ReportSchema);

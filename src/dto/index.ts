@@ -1,5 +1,5 @@
 import { PageDto } from './general/PageDto';
-import { ReportBodyDto } from './report/ReportBodyDto';
+import { CreateReportRequestDto } from './report/CreateReportRequestDto';
 import { ReviewBodyDto } from './review/ReviewBodyDto';
 import { ReviewParamsDto } from './review/ReviewParamsDto';
 import { SpecialityBodyDto } from './speciality/SpecialityBodyDto';
@@ -10,7 +10,7 @@ import { PostResponseDto } from './post/PostResponseDto';
 
 export {
   PageDto,
-  ReportBodyDto,
+  CreateReportRequestDto,
   ReviewBodyDto,
   ReviewParamsDto,
   SpecialityBodyDto,
