@@ -1,10 +1,6 @@
 import { RatingModel } from '../models/entities';
 
-export const addRating = async (
-  authUserId: string,
-  userId: string,
-  score: number,
-): Promise<void> => {
+export const update = async (authUserId: string, userId: string, score: number): Promise<void> => {
   await RatingModel.findOneAndUpdate(
     {
       doctorId: userId,
@@ -18,7 +14,7 @@ export const addRating = async (
     { upsert: true },
   );
 };
-export const removeRating = async (authUserId: string, userId: string): Promise<void> => {
+export const remove = async (authUserId: string, userId: string): Promise<void> => {
   await RatingModel.findOneAndDelete({
     doctorId: userId,
     userId: authUserId,
