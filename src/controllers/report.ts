@@ -9,7 +9,7 @@ export const getMany = (
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  ReportService.getManyReport(user.id, req.query.page)
+  ReportService.getManyReports(user.id, req.query.page)
     .then((dto) => res.json(dto))
     .catch(next);
 };

@@ -8,6 +8,7 @@ import postRouter from './postRouter';
 import searchRouter from './searchRouter';
 import relationRouter from './relationRouter';
 import reportRoutes from './reportRoutes';
+import userRoutes from './userRouter';
 import AuthMW from '../middlewares/auth';
 
 const router = express.Router();
@@ -21,4 +22,5 @@ router.use('/profile', AuthMW.authFilter, profileRouter());
 router.use('/universities', universityRouter());
 router.use('/specialities', specialityRouter());
 router.use('/reports', AuthMW.authFilter, reportRoutes());
+router.use('/users', AuthMW.authFilter, userRoutes());
 export default router;

@@ -2,8 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 import * as UniversityService from '../services/university';
 import { UniversityBodyDto } from '../dto';
 
-export const getAll = (req: Request, res: Response, next: NextFunction): void => {
-  UniversityService.getMany()
+export const getMany = (
+  req: Request<unknown, unknown, unknown, { page: number }>,
+  res: Response,
+  next: NextFunction,
+): void => {
+  UniversityService.getMany(req.query.page)
     .then((dto) => res.json(dto))
     .catch(next);
 };

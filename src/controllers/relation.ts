@@ -3,13 +3,13 @@ import * as RelationService from '../services/relation';
 import { TokenData } from '../models/TokenData';
 import { PageDto } from '../dto';
 
-export const getFriends = (
+export const getManyFriends = (
   req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  RelationService.getFriends(user.id, req.query.page)
+  RelationService.getManyFriends(user.id, req.query.page)
     .then((dto) => res.json(dto))
     .catch(next);
 };
@@ -31,32 +31,32 @@ export const deleteFriend = (
 ): void => {
   const user = req.user as TokenData;
 
-  RelationService.deleteFriend(user.id, req.params.userId)
+  RelationService.removeFriend(user.id, req.params.userId)
     .then(() => res.sendStatus(204))
     .catch(next);
 };
 
-export const getSubscribers = (
+export const getManySubscribers = (
   req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  RelationService.getSubscribers(user.id, req.query.page)
+  RelationService.getManySubscribers(user.id, req.query.page)
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const getSubscriptions = (
+export const getManySubscriptions = (
   req: Request<unknown, unknown, unknown, PageDto>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  RelationService.getSubscriptions(user.id, req.query.page)
+  RelationService.getManySubscriptions(user.id, req.query.page)
     .then((dto) => res.json(dto))
     .catch(next);
 };
-export const addSubscription = (
+export const createSubscription = (
   req: Request<{ userId: string }>,
   res: Response,
   next: NextFunction,
@@ -67,14 +67,14 @@ export const addSubscription = (
     .then(() => res.sendStatus(204))
     .catch(next);
 };
-export const deleteSubscription = (
+export const removeSubscription = (
   req: Request<{ userId: string }>,
   res: Response,
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
 
-  RelationService.deleteSubscription(user.id, req.params.userId)
+  RelationService.removeSubscription(user.id, req.params.userId)
     .then(() => res.sendStatus(204))
     .catch(next);
 };

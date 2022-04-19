@@ -31,14 +31,14 @@ export const getOneReport = async (
     _id: report._id.toString(),
   };
 };
-export const getManyReport = async (
+export const getManyReports = async (
   authUserId: string,
   page: number,
 ): Promise<ItemListResponseDto<ReportResponseDto>> => {
   const reports = await ReportModel.find(
     {},
     {},
-    { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: 'createdAt' },
+    { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: { _id: -1 } },
   )
     .populate<Pick<ReportResponseDto, 'user'>>('user', {
       _id: true,

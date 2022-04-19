@@ -30,9 +30,9 @@ export const getMany = async (
   page: number,
 ): Promise<ItemListResponseDto<CommentResponseDto>> => {
   const comments = await CommentModel.find(
-    { postId },
+    { post: postId },
     {},
-    { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: 'createdAt' },
+    { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: { _id: -1 } },
   )
     .populate<Pick<CommentResponseDto, 'user'>>('user', {
       _id: true,
@@ -41,7 +41,7 @@ export const getMany = async (
       avatar: true,
     })
     .lean();
-  const totalCount = await CommentModel.countDocuments({ postId });
+  const totalCount = await CommentModel.countDocuments({ post: postId });
   return {
     items: comments.map((comment) => ({
       ...comment,

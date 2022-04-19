@@ -13,7 +13,7 @@ export const getMany = async (
 ): Promise<ItemListResponseDto<PostResponseDto>> => {
   const page = query.page || 1;
   const results = await Promise.all([
-    PostModel.find({ userId: query.userId })
+    PostModel.find({ user: query.userId })
       .sort({ _id: -1 })
       .limit(PAGE_SIZE)
       .skip(PAGE_SIZE * (page - 1))
@@ -24,7 +24,7 @@ export const getMany = async (
         avatar: true,
       })
       .lean(),
-    PostModel.countDocuments({ userId: query.userId }),
+    PostModel.countDocuments({ user: query.userId }),
   ]);
 
   return {

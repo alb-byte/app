@@ -8,7 +8,7 @@ export const create = (
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  RatingService.addRating(user.id, req.params.userId, req.body.score)
+  RatingService.update(user.id, req.params.userId, req.body.score)
     .then(() => res.sendStatus(204))
     .catch(next);
 };
@@ -19,7 +19,7 @@ export const remove = (
   next: NextFunction,
 ): void => {
   const user = req.user as TokenData;
-  RatingService.removeRating(user.id, req.params.userId)
+  RatingService.remove(user.id, req.params.userId)
     .then(() => res.sendStatus(204))
     .catch(next);
 };

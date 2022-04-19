@@ -140,7 +140,7 @@ export const registration = async (
   ];
   if (dto.userType === UserType.DOCTOR) {
     promises.push(
-      DoctorInfoModel.create({ ...doctorInfo, userId: user._id }).then(async (docInfo) => {
+      DoctorInfoModel.create({ ...doctorInfo, user: user._id }).then(async (docInfo) => {
         await UserModel.findByIdAndUpdate(user._id, { $set: { userInfo: docInfo._id } });
       }),
     );

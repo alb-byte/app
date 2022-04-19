@@ -23,13 +23,13 @@ export const getMany = async (
       path: 'post',
       options: {
         limit: PAGE_SIZE,
-        sort: { createdAt: -1 },
+        sort: { _id: -1 },
         skip: (page - 1) * PAGE_SIZE,
       },
       populate: { path: 'user', select: '_id firstName lastName avatar' },
     })
     .lean();
-  const totalCount = await FeedModel.countDocuments({ userId: authUserId });
+  const totalCount = await FeedModel.countDocuments({ user: authUserId });
   return {
     items: posts.map((i) => {
       return {

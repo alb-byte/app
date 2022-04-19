@@ -6,7 +6,7 @@ import { Sex, UserType } from '../enums';
 import { UserRelation } from '../enums/UserRelation';
 const PAGE_SIZE = 5;
 
-export const getSubscriptions = async (
+export const getManySubscriptions = async (
   authUserId: string,
   page: number,
 ): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
@@ -42,7 +42,7 @@ export const getSubscriptions = async (
     };
   else throw createHttpError(404, 'user not found');
 };
-export const getSubscribers = async (
+export const getManySubscribers = async (
   authUserId: string,
   page: number,
 ): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
@@ -78,7 +78,7 @@ export const getSubscribers = async (
     };
   else throw createHttpError(404, 'user not found');
 };
-export const getFriends = async (
+export const getManyFriends = async (
   authUserId: string,
   page: number,
 ): Promise<ItemListResponseDto<UserPreviewResponseDto>> => {
@@ -128,7 +128,7 @@ export const addFriend = async (authUserId: string, userId: string): Promise<voi
   ]);
 };
 
-export const deleteFriend = async (authUserId: string, userId: string): Promise<void> => {
+export const removeFriend = async (authUserId: string, userId: string): Promise<void> => {
   await Promise.all([
     UserModel.findByIdAndUpdate(authUserId, {
       $push: { subscribers: userId },
@@ -148,7 +148,7 @@ export const addSubscription = async (authUserId: string, userId: string): Promi
   ]);
 };
 
-export const deleteSubscription = async (authUserId: string, userId: string): Promise<void> => {
+export const removeSubscription = async (authUserId: string, userId: string): Promise<void> => {
   await Promise.all([
     UserModel.findByIdAndUpdate(authUserId, { $pull: { subscriptions: userId } }),
     UserModel.findByIdAndUpdate(userId, { $pull: { subscribers: authUserId } }),

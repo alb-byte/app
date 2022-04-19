@@ -144,7 +144,7 @@ export const getOne = async (authUserId: string, userId: string): Promise<UserRe
           },
         },
       ]),
-      ReviewModel.countDocuments({ doctorId: user._id }),
+      ReviewModel.countDocuments({ doctor: user._id }),
     ]);
     if (allDoctorInfo[0])
       userInfo = {

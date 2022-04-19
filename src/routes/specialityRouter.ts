@@ -3,7 +3,7 @@ import * as SpecialityController from '../controllers/speciality';
 
 export default function (): Router {
   const router = express.Router();
-  router.get('/', SpecialityController.getAll);
+  router.get('/', SpecialityController.getMany);
   router.get('/:specialityId', SpecialityController.getOne);
   router.post('/', SpecialityController.create);
   router.put('/:specialityId', SpecialityController.update);

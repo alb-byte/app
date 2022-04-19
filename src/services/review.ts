@@ -32,17 +32,16 @@ export const getManyReview = async (
   userId: string,
   page: number,
 ): Promise<ItemListResponseDto<ReviewResponseDto>> => {
-  const reviews = await ReviewModel.find(
-    { doctor: userId },
-    {},
-    { skip: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, sort: 'createdAt' },
-  )
+  const reviews = await ReviewModel.find({ doctor: userId })
     .populate<Pick<ReviewResponseDto, 'user'>>('user', {
       _id: true,
       firstName: true,
       lastName: true,
       avatar: true,
     })
+    .sort({ createdAt: -1 })
+    .skip((page - 1) * PAGE_SIZE)
+    .limit(PAGE_SIZE)
     .lean();
   const totalCount = await ReviewModel.countDocuments({ doctor: userId });
   return {
