@@ -1,13 +1,13 @@
 import { IUniversity } from '../models/interfaces';
 import { UniversityModel } from '../models/entities';
 import { ItemListResponseDto } from '../dto';
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 3;
 export const getMany = async (page: number = 1): Promise<ItemListResponseDto<IUniversity>> => {
   const universityData = await Promise.all([
     UniversityModel.find({})
       .sort({ name: 1 })
-      .skip((page - 1) * PAGE_SIZE)
-      .limit(PAGE_SIZE)
+      // .skip((page - 1) * PAGE_SIZE)
+      // .limit(PAGE_SIZE)
       .lean(),
     UniversityModel.countDocuments({}),
   ]);

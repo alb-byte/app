@@ -7,8 +7,8 @@ export const getMany = async (page: number = 1): Promise<ItemListResponseDto<ISp
   const specialityData = await Promise.all([
     SpecialityModel.find({})
       .sort({ name: 1 })
-      .skip((page - 1) * PAGE_SIZE)
-      .limit(PAGE_SIZE)
+      // .skip((page - 1) * PAGE_SIZE)
+      // .limit(PAGE_SIZE)
       .lean(),
     SpecialityModel.countDocuments({}),
   ]);
