@@ -4,7 +4,7 @@ import { ItemListResponseDto } from '../dto';
 import { UserPreviewResponseDto } from '../dto/user/UserPreviewResponseDto';
 import { Sex, UserType } from '../enums';
 import { UserRelation } from '../enums/UserRelation';
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 20;
 
 export const getManySubscriptions = async (
   authUserId: string,

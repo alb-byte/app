@@ -7,6 +7,9 @@ export const getMany = async (
   page: number,
 ): Promise<ItemListResponseDto<PostResponseDto>> => {
   const posts = await FeedModel.find({ user: authUserId }, { _id: false, user: false })
+    .limit(PAGE_SIZE)
+    .sort({ _id: -1 })
+    .skip((page - 1) * PAGE_SIZE)
     .populate<{
       post: {
         _id: Types.ObjectId;
@@ -21,11 +24,11 @@ export const getMany = async (
       };
     }>({
       path: 'post',
-      options: {
-        limit: PAGE_SIZE,
-        sort: { _id: -1 },
-        skip: (page - 1) * PAGE_SIZE,
-      },
+      // options: {
+      //   limit: PAGE_SIZE,
+      //   sort: { _id: -1 },
+      //   skip: (page - 1) * PAGE_SIZE,
+      // },
       populate: { path: 'user', select: '_id firstName lastName avatar' },
     })
     .lean();

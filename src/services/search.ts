@@ -21,8 +21,8 @@ export const searchUser = async (
     },
   };
   const predicate = termFilter
-    ? { $and: [termFilter, { _id: { $ne: authUserId } }] }
-    : { _id: { $ne: authUserId } };
+    ? { $and: [termFilter, { _id: { $ne: authUserId } }, { userType: { $ne: UserType.ADMIN } }] }
+    : { $and: [{ _id: { $ne: authUserId } }, { userType: { $ne: UserType.ADMIN } }] };
   const users = await UserModel.find<UserPreviewResponseDto>(predicate, {
     _id: 1,
     firstName: 1,
@@ -31,7 +31,7 @@ export const searchUser = async (
     userType: 1,
     sex: 1,
   })
-    .sort({ firstName: -1 })
+    .sort({ firstName: 1 })
     .skip((page - 1) * PAGE_SIZE)
     .limit(PAGE_SIZE);
   const totalCount = await UserModel.countDocuments(predicate);
@@ -61,6 +61,10 @@ export const searchDoctor = async (
           options: 'i',
         },
       },
+    });
+  if (sex)
+    userFilters.push({
+      sex,
     });
   const doctorFilters: Array<any> = [];
   if (dto.speciality)

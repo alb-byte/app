@@ -3,7 +3,7 @@ import { UserModel } from '../models/entities';
 import { ItemListResponseDto } from '../dto';
 import { UserPreviewResponseDto } from '../dto/user/UserPreviewResponseDto';
 import { UserType } from '../enums';
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 20;
 
 export const getUnApprovedUsers = async (
   authUserId: string,
